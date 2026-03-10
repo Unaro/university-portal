@@ -1,0 +1,116 @@
+// src/app/dashboard/profile/profile-form.tsx
+"use client";
+
+import { useActionState, useState, useEffect } from "react"; // <--- Добавь useEffect
+import { updateStudentProfile, ProfileState } from "@/app/actions/profile";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MultiSelect, Option } from "@/components/ui/multi-select";
+import Link from "next/link";
+import { toast } from "sonner";
+
+interface ProfileFormProps {
+  initialData: {
+    group: string;
+    majorId: string;
+    course: string;
+    skills: string[];
+  };
+  majors: { id: number; name: string }[];
+  skills: Option[];
+}
+
+const initialState: ProfileState = { success: false, message: "" };
+
+export function StudentProfileForm({ initialData, majors, skills }: ProfileFormProps) {
+  const [state, dispatch, isPending] = useActionState(updateStudentProfile, initialState);
+  
+  const [selectedSkills, setSelectedSkills] = useState<string[]>(initialData.skills);
+  const [selectedMajor, setSelectedMajor] = useState<string>(initialData.majorId);
+  const [selectedCourse, setSelectedCourse] = useState<string>(initialData.course);
+
+  // --- МАГИЯ TOAST ---
+  useEffect(() => {
+    if (state.message) {
+      if (state.success) {
+        toast.success(state.message);
+      } else {
+        toast.error(state.message);
+      }
+    }
+  }, [state]); // Срабатывает при изменении ответа от сервера
+  // -------------------
+
+  return (
+    <Card>
+      <CardContent className="pt-6">
+        <form action={dispatch} className="space-y-6">
+          
+          {/* ... (поля формы без изменений: Группа, Курс, Специальность) ... */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="group">Учебная группа</Label>
+              <Input id="group" name="group" defaultValue={initialData.group} placeholder="ИВТ-41" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="course">Курс</Label>
+              <input type="hidden" name="course" value={selectedCourse} />
+              <Select value={selectedCourse} onValueChange={setSelectedCourse}>
+                <SelectTrigger><SelectValue placeholder="Выберите курс" /></SelectTrigger>
+                <SelectContent>
+                  {[1, 2, 3, 4, 5, 6].map((c) => (
+                    <SelectItem key={c} value={c.toString()}>{c} курс</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Специальность (Major)</Label>
+            <input type="hidden" name="majorId" value={selectedMajor} />
+            <Select value={selectedMajor} onValueChange={setSelectedMajor}>
+              <SelectTrigger><SelectValue placeholder="Выберите специальность" /></SelectTrigger>
+              <SelectContent>
+                {majors.map((m) => (
+                  <SelectItem key={m.id} value={m.id.toString()}>{m.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Мои навыки</Label>
+            <input type="hidden" name="skills" value={JSON.stringify(selectedSkills)} />
+            <MultiSelect
+              options={skills}
+              selected={selectedSkills}
+              onChange={setSelectedSkills}
+              placeholder="Выберите технологии..."
+            />
+          </div>
+
+          {/* МЫ УДАЛИЛИ БЛОК ВЫВОДА ОШИБКИ ТУТ, ТАК КАК ТЕПЕРЬ ЕСТЬ TOAST */}
+
+          <div className="flex gap-4">
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Сохранение..." : "Сохранить профиль"}
+            </Button>
+            <Link href="/dashboard">
+              <Button variant="outline" type="button">На главную</Button>
+            </Link>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
