@@ -2,24 +2,54 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
+import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 
-// Если переменной нет (во время билда), используем заглушку, чтобы не падать
-const connectionString = process.env.DATABASE_URL || "postgres://portal_user:LocalDev_Password_2024_Secure!@localhost:5432/portal_db";
+// Типизация для базы данных
+export type Database = PostgresJsDatabase<typeof schema>;
 
-let connection: postgres.Sql;
+// Настройки connection pool для оптимизации соединений
+const poolOptions = {
+  max: 10,              // Максимум 10 одновременных соединений
+  idle_timeout: 20,     // Закрывать idle соединения через 20 секунд
+  connect_timeout: 5,   // Таймаут подключения 5 секунд
+};
 
-if (process.env.NODE_ENV === "production") {
-  // lazy connect (postgres-js делает это по умолчанию)
-  connection = postgres(connectionString, { prepare: false });
-} else {
-  // ... dev logic
-  const globalConnection = global as typeof globalThis & {
-    postgres: postgres.Sql;
-  };
-  if (!globalConnection.postgres) {
-    globalConnection.postgres = postgres(connectionString);
+// Ленивая инициализация подключения
+// Подключение создаётся только при первом обращении к БД, а не при импорте модуля
+function createConnection() {
+  const connectionString = process.env.DATABASE_URL;
+
+  if (!connectionString) {
+    throw new Error(
+      "DATABASE_URL is not defined. Check your .env file or Docker environment."
+    );
   }
-  connection = globalConnection.postgres;
+
+  if (process.env.NODE_ENV === "production") {
+    return postgres(connectionString, poolOptions);
+  } else {
+    // Для разработки: сохраняем соединение в globalThis для hot-reload
+    const globalConnection = globalThis as typeof globalThis & {
+      postgresConnection?: postgres.Sql;
+    };
+
+    if (!globalConnection.postgresConnection) {
+      globalConnection.postgresConnection = postgres(connectionString, poolOptions);
+    }
+    return globalConnection.postgresConnection;
+  }
 }
 
-export const db = drizzle(connection, { schema });
+// Proxy для ленивой инициализации
+// Подключение к БД будет создано только при первом реальном использовании
+const handler = {
+  get(target: any, prop: string) {
+    if (!target._connection) {
+      target._connection = createConnection();
+      target._drizzle = drizzle(target._connection, { schema });
+    }
+    return target._drizzle[prop];
+  },
+};
+
+export const db = new Proxy({} as any, handler) as Database;
