@@ -20,7 +20,10 @@
     ],
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    // Дополнительные проверки
+    "noUnusedLocals": false,  // Предупреждать о неиспользуемых переменных (false = только warning)
+    "noUnusedParameters": false // Предупреждать о неиспользуемых параметрах
   },
   "include": [
     "next-env.d.ts",

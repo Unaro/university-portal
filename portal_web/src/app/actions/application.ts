@@ -6,25 +6,20 @@ import { db } from "@/db";
 import { applications, students, vacancies } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-
-// 1. Строгий тип ответа (никаких any)
-export type ApplicationActionState = {
-  success: boolean;
-  message: string;
-};
+import { ActionResponse } from "@/shared/types/action";
 
 // 2. Функция принимает ID вакансии (number) и возвращает строгий Promise
-export async function applyToVacancy(vacancyId: number): Promise<ApplicationActionState> {
+export async function applyToVacancy(vacancyId: number): Promise<ActionResponse> {
   const session = await auth();
 
   // Проверка сессии
   if (!session?.user?.id) {
-    return { success: false, message: "Вы не авторизованы." };
+    return { success: false, message: "Вы не авторизованы.", code: "UNAUTHORIZED" };
   }
 
   // Проверка роли
   if (session.user.role !== "student") {
-    return { success: false, message: "Только студенты могут откликаться на вакансии." };
+    return { success: false, message: "Только студенты могут откликаться на вакансии.", code: "FORBIDDEN" };
   }
 
   // Поиск профиля студента
@@ -33,7 +28,7 @@ export async function applyToVacancy(vacancyId: number): Promise<ApplicationActi
   });
 
   if (!studentProfile) {
-    return { success: false, message: "Профиль студента не найден. Обратитесь к администратору." };
+    return { success: false, message: "Профиль студента не найден. Обратитесь к администратору.", code: "NOT_FOUND" };
   }
 
   // Проверка существования вакансии
@@ -42,7 +37,7 @@ export async function applyToVacancy(vacancyId: number): Promise<ApplicationActi
   });
 
   if (!vacancy || !vacancy.isActive) {
-    return { success: false, message: "Вакансия не найдена или неактивна." };
+    return { success: false, message: "Вакансия не найдена или неактивна.", code: "NOT_FOUND" };
   }
 
   // Проверка дубликатов (уже откликался?)
@@ -54,7 +49,7 @@ export async function applyToVacancy(vacancyId: number): Promise<ApplicationActi
   });
 
   if (existingApplication) {
-    return { success: false, message: "Вы уже отправили заявку на эту вакансию." };
+    return { success: false, message: "Вы уже отправили заявку на эту вакансию.", code: "CONFLICT" };
   }
 
   try {
@@ -69,13 +64,15 @@ export async function applyToVacancy(vacancyId: number): Promise<ApplicationActi
     return { success: true, message: "Заявка успешно отправлена!" };
   } catch (error) {
     console.error("Application error:", error);
-    return { success: false, message: "Внутренняя ошибка сервера при создании заявки." };
+    return { success: false, message: "Внутренняя ошибка сервера при создании заявки.", code: "DATABASE_ERROR" };
   }
 }
 
-export async function deleteApplication(applicationId: number) {
+export async function deleteApplication(applicationId: number): Promise<ActionResponse> {
   const session = await auth();
-  if (!session?.user) return { success: false, message: "Не авторизован" };
+  if (!session?.user) {
+    return { success: false, message: "Не авторизован", code: "UNAUTHORIZED" };
+  }
 
   try {
     // Проверяем, что удаляет владелец (студент)
@@ -83,14 +80,16 @@ export async function deleteApplication(applicationId: number) {
       where: eq(students.userId, parseInt(session.user.id)),
     });
 
-    if (!student) return { success: false, message: "Профиль не найден" };
+    if (!student) {
+      return { success: false, message: "Профиль не найден", code: "NOT_FOUND" };
+    }
 
     const app = await db.query.applications.findFirst({
       where: eq(applications.id, applicationId),
     });
 
     if (!app || app.studentId !== student.id) {
-      return { success: false, message: "Заявка не найдена или нет прав" };
+      return { success: false, message: "Заявка не найдена или нет прав", code: "FORBIDDEN" };
     }
 
     await db.delete(applications).where(eq(applications.id, applicationId));
@@ -100,6 +99,6 @@ export async function deleteApplication(applicationId: number) {
     return { success: true, message: "Отклик отозван" };
   } catch (error) {
     console.error("Delete app error:", error);
-    return { success: false, message: "Ошибка при удалении" };
+    return { success: false, message: "Ошибка при удалении", code: "DATABASE_ERROR" };
   }
 }

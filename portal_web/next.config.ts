@@ -8,11 +8,13 @@ const bucketName = process.env.S3_BUCKET_NAME || "portal-documents";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  
+
+  // Включаем строгую проверку типов при билде
+  // Если есть TS ошибки — билд упадёт (это правильно)
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
-  
+
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb',

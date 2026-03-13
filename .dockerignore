@@ -1,0 +1,45 @@
+# ===========================================
+# .dockerignore для корня проекта
+# ===========================================
+
+# --- Git ---
+.git/
+
+# --- IDE ---
+.idea/
+.vscode/
+
+# --- Node modules (в portal_web) ---
+portal_web/node_modules/
+
+# --- Build артефакты ---
+portal_web/.next/
+portal_web/out/
+portal_web/dist/
+
+# --- Окружение ---
+.env
+.env.local
+.env.*.local
+
+# --- Логи ---
+*.log
+logs/
+
+# --- Временные файлы ---
+tmp/
+temp/
+*.tmp
+
+# --- Документация ---
+*.md
+!README.md
+
+# --- Тесты ---
+coverage/
+portal_web/coverage/
+
+# --- Docker ---
+docker-compose*.yaml
+compose.yaml
+.dockerignore

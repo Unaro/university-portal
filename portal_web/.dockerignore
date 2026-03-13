@@ -1,0 +1,81 @@
+# ===========================================
+# .dockerignore для University Portal
+# ===========================================
+
+# --- Git ---
+.git
+.gitignore
+.gitattributes
+
+# --- Qwen / AI ---
+.qwen
+*.qwen
+
+# --- Документация ---
+*.md
+README.md
+LICENSE
+docs/
+
+# --- IDE ---
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# --- Node.js / NPM ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+
+# --- Тесты и покрытие ---
+coverage/
+*.lcov
+.nyc_output/
+
+# --- Окружение ---
+.env
+.env.local
+.env.*.local
+.env.test
+.env.production
+
+# --- Build артефакты ---
+.next/
+out/
+build/
+dist/
+
+# --- Vite / Vitest ---
+vitest.config.ts.timestamp-*
+vite.config.ts.timestamp-*
+
+# --- Drizzle ---
+drizzle/meta/
+*.sql
+
+# --- Временные файлы ---
+tmp/
+temp/
+*.log
+logs/
+
+# --- Docker ---
+Dockerfile
+docker-compose*.yaml
+compose.yaml
+.dockerignore
+
+# --- CI/CD ---
+.github/
+.gitlab-ci.yml
+.travis.yml
+Jenkinsfile
+
+# --- Верификация ---
+.eslintignore
+.prettierignore

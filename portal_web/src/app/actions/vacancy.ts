@@ -31,7 +31,7 @@ const createVacancySchema = z.object({
 export type CreateVacancyState = {
   success: boolean;
   message: string;
-  errors?: unknown;
+  errors?: Record<string, string[]>;
 };
 
 export async function createVacancy(

@@ -2,7 +2,8 @@
 "use client";
 
 import { useActionState, useEffect } from "react";
-import { applyToVacancy, ApplicationActionState } from "@/app/actions/application";
+import { applyToVacancy } from "@/app/actions/application";
+import { ActionResponse } from "@/shared/types/action";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -13,7 +14,7 @@ interface ApplyButtonProps {
   className?: string;
 }
 
-const initialState: ApplicationActionState = { success: false, message: "" };
+const initialState: ActionResponse = { success: false, message: "" };
 
 export function ApplyButton({ vacancyId, isApplied, disabled, className }: ApplyButtonProps) {
   // Мы используем bind, чтобы передать ID в экшен, не создавая скрытых инпутов

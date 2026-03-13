@@ -1,17 +1,22 @@
 import { defineConfig } from "drizzle-kit";
 import * as dotenv from "dotenv";
+import { join } from "path";
 
-// 1. Указываем путь на папку выше (в корень university-portal)
-dotenv.config({ path: "../.env" });
+// Загружаем .env из корня проекта (parent directory)
+dotenv.config({ path: join(__dirname, "../.env") });
 
-const localDbUrl = `postgres://${process.env.DB_USER}:${process.env.DB_PASSWORD}@localhost:5432/${process.env.DB_NAME}`;
+const connectionString = process.env.DATABASE_URL;
+
+if (!connectionString) {
+  throw new Error("DATABASE_URL is not defined. Check your .env file.");
+}
 
 export default defineConfig({
-  schema: "./src/db/schema.ts",
-  out: "./drizzle",
+  schema: join(__dirname, "src/db/schema.ts"),
+  out: join(__dirname, "drizzle"),
   dialect: "postgresql",
   dbCredentials: {
-    url: localDbUrl,
+    url: connectionString,
   },
   verbose: true,
   strict: true,

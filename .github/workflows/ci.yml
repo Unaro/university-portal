@@ -1,0 +1,128 @@
+# ===========================================
+# GitHub Actions CI/CD Workflow
+# ===========================================
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+# Отменяем предыдущие запуски при новом пуше
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ===========================================
+  # Job 1: Lint & Type Check
+  # ===========================================
+  lint-and-typecheck:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: portal_web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./portal_web
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: ./portal_web
+        run: npm run lint
+
+      - name: Run TypeScript type check
+        working-directory: ./portal_web
+        run: npx tsc --noEmit
+
+  # ===========================================
+  # Job 2: Tests
+  # ===========================================
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: portal_web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./portal_web
+        run: npm ci
+
+      - name: Run tests
+        working-directory: ./portal_web
+        run: npm run test:run
+
+      # Опционально: загрузка покрытия
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: portal_web/coverage/
+          retention-days: 7
+
+  # ===========================================
+  # Job 3: Build
+  # ===========================================
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint-and-typecheck, tests]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: portal_web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./portal_web
+        run: npm ci
+
+      - name: Create .env for build
+        working-directory: ./portal_web
+        run: |
+          cp ../.env.example ../.env
+          # Заменяем заглушки на тестовые значения
+          sed -i 's/<GENERATE_SECURE_PASSWORD>/TestPassword123!/g' ../.env
+          sed -i 's/<GENERATE_SECURE_SECRET>/TestSecretForBuildProcess123!/g' ../.env
+
+      - name: Build Next.js
+        working-directory: ./portal_web
+        run: npm run build
+        env:
+          DATABASE_URL: postgres://test:test@localhost:5432/test
+          NEXT_PUBLIC_S3_ENDPOINT: http://localhost:9000
+
+      # Опционально: сохранение билда
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: nextjs-build
+          path: portal_web/.next/
+          retention-days: 1
