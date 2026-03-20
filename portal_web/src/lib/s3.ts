@@ -1,7 +1,6 @@
 // src/lib/s3.ts
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { NodeHttpHandler } from "@smithy/node-http-handler";
 
 const BUCKET_NAME = process.env.S3_BUCKET_NAME!;
 const REGION = process.env.S3_REGION || "us-east-1";
@@ -23,16 +22,12 @@ const internalClient = new S3Client({
   forcePathStyle: true,
   requestChecksumCalculation: "WHEN_REQUIRED",
   responseChecksumValidation: "WHEN_REQUIRED",
-  requestHandler: new NodeHttpHandler({
-    connectionTimeout: 2000,
-    socketTimeout: 5000,
-  }),
 });
 
 // 2. ВНЕШНИЙ КЛИЕНТ (Для генерации ссылок браузеру)
 const publicClient = new S3Client({
   region: REGION,
-  endpoint: PUBLIC_ENDPOINT, // <--- ИЗМЕНЕНИЕ ЗДЕСЬ
+  endpoint: PUBLIC_ENDPOINT,
   credentials: {
     accessKeyId: process.env.S3_ACCESS_KEY!,
     secretAccessKey: process.env.S3_SECRET_KEY!,
