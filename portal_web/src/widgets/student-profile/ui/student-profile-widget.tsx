@@ -38,8 +38,7 @@ export function StudentProfileWidget({
     value: s.id.toString() 
   }));
 
-  // 2. Преобразуем специальности (если нужно для селекта, или передаем как есть)
-  // В StudentProfileForm мы ожидаем массив объектов с id и name, что соответствует типу Major
+  // 2. Преобразуем специальности
   
   return (
     <Tabs defaultValue="profile" className="w-full">
@@ -59,8 +58,8 @@ export function StudentProfileWidget({
           <CardContent>
              <StudentProfileForm 
                 initialData={profileData}
-                majors={majors}      // Передаем сырой список Major[]
-                skills={skillOptions} // Передаем преобразованный Option[]
+                majors={majors}
+                skills={skillOptions}
              />
           </CardContent>
         </Card>

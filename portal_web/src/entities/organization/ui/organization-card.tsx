@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { organizations } from "@/db/schema";
+import Image from "next/image";
 
 interface OrganizationCardProps {
   data: typeof organizations.$inferSelect & {
@@ -23,7 +24,7 @@ export function OrganizationCard({ data }: OrganizationCardProps) {
         <CardHeader className="flex flex-row items-start gap-4 pb-3">
           {data.logo ? (
              // Если есть лого - показываем (пока заглушка для верстки, потом подключим S3 Image)
-             <img src={data.logo} alt={data.name} className="w-14 h-14 rounded-xl object-contain border" />
+             <Image src={data.logo} alt={data.name} className="w-14 h-14 rounded-xl object-contain border" />
           ) : (
              <div className={`w-14 h-14 rounded-xl ${logoColor} flex items-center justify-center text-white font-bold text-xl shadow-md shrink-0`}>
                {data.name.charAt(0)}
@@ -60,7 +61,7 @@ export function OrganizationCard({ data }: OrganizationCardProps) {
         <CardFooter className="pt-0 mt-auto">
           {data.vacanciesCount && data.vacanciesCount > 0 ? (
             <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-white transition-colors">
-              Смотреть {data.vacanciesCount} вакансий
+              Подробнее [Количество вакансий: {data.vacanciesCount}]
             </Button>
           ) : (
             <Button variant="ghost" disabled className="w-full bg-slate-50 text-muted-foreground">

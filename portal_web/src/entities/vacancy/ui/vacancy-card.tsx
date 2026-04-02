@@ -69,11 +69,11 @@ export function VacancyCard({ data }: { data: VacancyCardProps }) {
             </div>
           </div>
 
-          <div className="flex items-center md:self-center shrink-0">
+          {/* <div className="flex items-center md:self-center shrink-0">
             <Link href={`/practices/${data.id}`} className="w-full md:w-auto">
               <Button className="w-full">Подробнее</Button>
             </Link>
-          </div>
+          </div> */}
         </div>
       </CardContent>
     </Card>

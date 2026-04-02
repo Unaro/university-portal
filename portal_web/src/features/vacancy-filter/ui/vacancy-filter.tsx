@@ -107,9 +107,8 @@ export function VacancyFilter() {
                 {[1, 2, 3, 4].map(course => (
                     <FilterCheckbox 
                         key={course} 
-                        label={`${course} курс и старше`} 
+                        label={`${course} курс`} 
                         checked={isChecked("course", course.toString())} 
-                        // Логика курса чуть сложнее (обычно это мин. курс), но для чекбоксов можно сделать точное совпадение или "gte"
                         onCheckedChange={(c) => handleFilter("course", course.toString(), c as boolean)} 
                     />
                 ))}

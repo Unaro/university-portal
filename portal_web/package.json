@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "db:push": "drizzle-kit push",
+    "db:seeder": "tsx src/db/seeder.ts",
+    "db:clear": "CLEAR_DB=true CLEAR_MINIO=false tsx src/db/seeder.ts",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",

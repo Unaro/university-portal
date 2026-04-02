@@ -7,30 +7,43 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Копируем package.json
-COPY package.json package-lock.json* ./
+# Устанавливаем pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Копируем package.json и lock-файл
+COPY package.json pnpm-lock.yaml ./
 # Устанавливаем зависимости
-RUN npm ci
+RUN pnpm install --frozen-lockfile
 
 # 3. Стадия сборки (Builder)
 FROM base AS builder
 WORKDIR /app
+# Устанавливаем pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Ловим аргумент из compose.yaml
 ARG NEXT_PUBLIC_S3_ENDPOINT
 
-# Делаем его доступным для команды npm run build
+# Делаем его доступным для команды pnpm run build
 ENV NEXT_PUBLIC_S3_ENDPOINT=$NEXT_PUBLIC_S3_ENDPOINT
 
 # Отключаем телеметрию Next.js (ускоряет сборку)
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Запускаем билд
-RUN npm run build
+RUN pnpm run build
 
-# 4. Финальная стадия (Runner)
+# 4. Стадия для seeder (Seeder)
+FROM base AS seeder
+WORKDIR /app
+RUN apk add --no-cache libc6-compat
+RUN corepack enable && corepack prepare pnpm@latest --activate
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# 5. Финальная стадия (Runner)
 FROM base AS runner
 WORKDIR /app
 
@@ -48,8 +61,13 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Копируем папку миграций (чтобы Drizzle мог их найти, если понадобится)
-# COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
+# Копируем файлы для seeder
+COPY --from=builder --chown=nextjs:nodejs /app/src ./src
+COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./
+COPY --from=builder --chown=nextjs:nodejs /app/package.json ./
+COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
+# Копируем node_modules со стадии seeder
+COPY --from=seeder /app/node_modules ./node_modules
 
 USER nextjs
 

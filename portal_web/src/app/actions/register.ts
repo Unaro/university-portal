@@ -70,10 +70,9 @@ export async function registerUser(
         })
         .returning();
 
-      // Б. Создаем пустой профиль студента (ОБЯЗАТЕЛЬНО для работы заявок)
+      // Б. Создаем пустой профиль студента
       await tx.insert(students).values({
         userId: newUser.id,
-        // group и major можно будет заполнить позже в профиле
       });
     });
 

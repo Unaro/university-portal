@@ -24,8 +24,10 @@ export function ResumeForm({
 
   // Добавляем уведомления
   useEffect(() => {
-    if (state.message) {
-      state.success ? toast.success(state.message) : toast.error(state.message);
+    if (state.message && state.success ) {
+      toast.success(state.message);
+    } else if (state.message) {
+      toast.error(state.message);
     }
   }, [state]);
 
@@ -45,17 +47,17 @@ export function ResumeForm({
             />
           </div>
 
-          <div className="bg-slate-50 p-4 rounded border border-slate-200">
+          {/* <div className="bg-slate-50 p-4 rounded border border-slate-200">
             <Label className="mb-2 block">Ваши навыки</Label>
             <div className="text-sm text-slate-500 mb-3">
               Навыки автоматически подтягиваются из вашего профиля.
             </div>
-            <Link href="/profile"> {/* Ссылка на новый профиль */}
+            <Link href="/profile">
               <Button variant="secondary" size="sm" type="button">
                 Настроить навыки
               </Button>
             </Link>
-          </div>
+          </div> */}
 
           <div className="space-y-2">
             <Label htmlFor="file">Файл резюме (PDF)</Label>

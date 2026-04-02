@@ -57,6 +57,26 @@ services:
     environment:
       - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
 
+  # 4. SEEDER (заполняет БД и MinIO)
+  seeder:
+    build:
+      context: portal_web
+      target: seeder # Используем стадию seeder
+      args:
+        NEXT_PUBLIC_S3_ENDPOINT: ${S3_PUBLIC_ENDPOINT}
+    container_name: portal-seeder
+    depends_on:
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      - S3_ENDPOINT=http://minio:9000
+    entrypoint: ["sh", "-c", "npx drizzle-kit push && npx tsx src/db/seeder.ts"]
+
 volumes:
   # Можно оставить пустыми, Docker сам создаст default тома
   postgres_data:

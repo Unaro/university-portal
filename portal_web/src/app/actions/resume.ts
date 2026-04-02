@@ -36,7 +36,7 @@ export async function saveResume(
       return { success: false, message: "Профиль студента не найден. Заполните данные в настройках." };
     }
 
-    // 3. Данные формы (Skills убрали, так как они в профиле)
+    // 3. Данные формы
     const bio = formData.get("bio") as string;
     const file = formData.get("file") as File;
 
@@ -55,14 +55,12 @@ export async function saveResume(
       .values({
         studentId: studentProfile.id,
         bio: bio,
-        // skills: ... <- УБРАЛИ
         fileUrl: fileUrl,
       })
       .onConflictDoUpdate({
         target: resumes.studentId,
         set: {
           bio: bio,
-          // skills: ... <- УБРАЛИ
           ...(fileUrl ? { fileUrl } : {}),
           updatedAt: new Date(),
         },

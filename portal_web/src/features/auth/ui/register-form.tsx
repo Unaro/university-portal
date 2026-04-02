@@ -62,8 +62,10 @@ function PartnerRegisterForm() {
   const [state, dispatch, isPending] = useActionState(registerPartner, { success: false, message: "" });
 
   useEffect(() => {
-    if (state.message) {
-      state.success ? toast.success(state.message) : toast.error(state.message);
+    if (state.message && state.success) {
+      toast.success(state.message);
+    } else if (state.message) {
+      toast.error(state.message);
     }
   }, [state]);
 
