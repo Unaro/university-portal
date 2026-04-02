@@ -41,15 +41,18 @@ function createConnection() {
 }
 
 // Proxy для ленивой инициализации
-// Подключение к БД будет создано только при первом реальном использовании
+// Подключение к БД будет создано при первом реальном использовании
 const handler = {
-  get(target: any, prop: string) {
+  get(target: { _connection?: postgres.Sql; _drizzle?: Database }, prop: string) {
     if (!target._connection) {
       target._connection = createConnection();
       target._drizzle = drizzle(target._connection, { schema });
     }
-    return target._drizzle[prop];
+    if (!target._drizzle) {
+      throw new Error("Database connection not initialized");
+    }
+    return target._drizzle[prop as keyof Database];
   },
 };
 
-export const db = new Proxy({} as any, handler) as Database;
+export const db = new Proxy({} as { _connection?: postgres.Sql; _drizzle?: Database }, handler) as Database;

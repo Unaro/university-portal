@@ -137,11 +137,12 @@ async function clearMinIO() {
     } else {
       console.log("  ℹ️ Bucket is empty");
     }
-  } catch (error: any) {
-    if (error.name === "NoSuchBucket") {
+  } catch (error: unknown) {
+    const err = error as { name?: string; message?: string };
+    if (err.name === "NoSuchBucket") {
       console.log("  ℹ️ Bucket does not exist yet");
     } else {
-      console.error("  ⚠ Error clearing bucket:", error.message);
+      console.error("  ⚠ Error clearing bucket:", err.message);
     }
   }
   
@@ -155,8 +156,9 @@ async function seedMinIO() {
   try {
     await s3Client.send(new CreateBucketCommand({ Bucket: BUCKET_NAME }));
     console.log(`  ✓ Created bucket '${BUCKET_NAME}'`);
-  } catch (error: any) {
-    if (error.name === "BucketAlreadyOwnedByYou" || error.name === "BucketAlreadyExists") {
+  } catch (error: unknown) {
+    const err = error as { name?: string };
+    if (err.name === "BucketAlreadyOwnedByYou" || err.name === "BucketAlreadyExists") {
       console.log(`  ℹ️ Bucket '${BUCKET_NAME}' already exists`);
     } else {
       throw error;
@@ -178,8 +180,9 @@ async function seedMinIO() {
       );
       console.log(`  ✓ ${file.path}`);
       successCount++;
-    } catch (error: any) {
-      console.error(`  ✗ ${file.path}: ${error.message}`);
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      console.error(`  ✗ ${file.path}: ${err.message}`);
     }
   }
   
