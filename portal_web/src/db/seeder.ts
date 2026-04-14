@@ -41,6 +41,12 @@ import {
 } from "./seed-data";
 import { S3Client, CreateBucketCommand, PutObjectCommand, DeleteObjectsCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 
+
+if (process.env.NODE_ENV === 'production' && !process.env.ALLOW_SEED_IN_PROD) {
+  console.error("seeding is disabled in production. Set ALLOW_SEED_IN_PROD=1 to override.");
+  process.exit(1);
+}
+
 // ==================== MINIO CLIENT ====================
 
 const BUCKET_NAME = process.env.S3_BUCKET_NAME || "portal-documents";

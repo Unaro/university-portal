@@ -65,24 +65,27 @@ services:
   seeder:
     build:
       context: portal_web
-      target: seeder
+      target: runner
       args:
         NEXT_PUBLIC_S3_ENDPOINT: ${S3_PUBLIC_ENDPOINT}
     container_name: portal-seeder
+    restart: "no" 
+    profiles: ["dev"] 
     depends_on:
       db:
         condition: service_healthy
       minio:
-        condition: service_started
+        condition: service_healthy
     env_file:
       - .env
     environment:
       - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
       - S3_ENDPOINT=http://minio:9000
+      - CLEAR_DB=${CLEAR_DB:-true}
+      - CLEAR_MINIO=${CLEAR_MINIO:-true}
     entrypoint: ["sh", "-c", "npx drizzle-kit push --force && npx tsx src/db/seeder.ts"]
     networks:
       - app_net
-
 
 volumes:
   postgres_data:
