@@ -36,33 +36,33 @@ export function ApplicationResponseForm({ applicationId }: ApplicationResponseFo
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 text-orange-600 font-medium text-sm mb-2">
+      <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400 font-medium text-sm mb-2">
          <Clock size={16} /> Ожидает решения
       </div>
       <form action={dispatch} className="space-y-3">
-        <Textarea 
-          name="message" 
-          placeholder="Напишите сообщение кандидату (время собеседования или причина отказа)..." 
+        <Textarea
+          name="message"
+          placeholder="Напишите сообщение кандидату (время собеседования или причина отказа)..."
           required
-          className="min-h-[100px] resize-none bg-white text-sm"
+          className="min-h-[100px] resize-none bg-card text-sm"
         />
         <div className="grid grid-cols-2 gap-2">
-          <Button 
-            type="submit" 
-            name="action" 
-            value="approved" 
+          <Button
+            type="submit"
+            name="action"
+            value="approved"
             disabled={isPending}
-            className="bg-green-600 hover:bg-green-700 w-full"
+            className="bg-green-600 hover:bg-green-700 dark:hover:bg-green-500 w-full"
           >
             Пригласить
           </Button>
-          <Button 
-            type="submit" 
-            name="action" 
-            value="rejected" 
+          <Button
+            type="submit"
+            name="action"
+            value="rejected"
             variant="outline"
             disabled={isPending}
-            className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 w-full"
+            className="text-destructive hover:text-destructive hover:bg-destructive/10 border-border w-full"
           >
             Отказать
           </Button>

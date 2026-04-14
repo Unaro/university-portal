@@ -63,7 +63,7 @@ export function ResumeForm({
             <Label htmlFor="file">Файл резюме (PDF)</Label>
             <Input id="file" name="file" type="file" accept="application/pdf" />
             {existingFile && (
-              <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
+              <p className="text-sm text-green-600 dark:text-green-400 mt-1 flex items-center gap-1">
                 <span>📄</span> Файл уже загружен. Загрузите новый, чтобы заменить.
               </p>
             )}

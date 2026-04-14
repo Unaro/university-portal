@@ -54,7 +54,7 @@ export function CreateVacancyForm({ allMajors, allSkills }: CreateVacancyFormPro
           <div className="space-y-2">
             <Label htmlFor="title">Название позиции *</Label>
             <Input id="title" name="title" placeholder="Java Developer / Стажер" required />
-            {state.errors?.title && <p className="text-red-500 text-sm">{state.errors.title}</p>}
+            {state.errors?.title && <p className="text-destructive text-sm">{state.errors.title}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -80,8 +80,8 @@ export function CreateVacancyForm({ allMajors, allSkills }: CreateVacancyFormPro
           </div>
 
           {/* Фильтры студентов */}
-          <div className="p-4 bg-slate-50 rounded-lg border space-y-4">
-            <h3 className="font-semibold text-sm text-slate-700">Требования к кандидату</h3>
+          <div className="p-4 bg-muted rounded-lg border space-y-4">
+            <h3 className="font-semibold text-sm text-muted-foreground">Требования к кандидату</h3>
             
             <div className="space-y-2">
                <Label>Минимальный курс</Label>

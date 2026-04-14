@@ -35,7 +35,7 @@ export function OrgSettingsForm({ initialData }: { initialData: Organization }) 
           {/* ... (поля формы без изменений: Название, Контакты, Сайт, Описание, Лого) ... */}
           <div className="space-y-2">
             <Label>Название (не меняется)</Label>
-            <Input value={initialData.name} disabled className="bg-slate-100" />
+            <Input value={initialData.name} disabled className="bg-muted" />
           </div>
           <div className="space-y-2">
             <Label htmlFor="contacts">Контакты</Label>

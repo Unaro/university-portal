@@ -26,11 +26,11 @@ export function OrganizationCard({ data }: OrganizationCardProps) {
              // Если есть лого - показываем (пока заглушка для верстки, потом подключим S3 Image)
              <Image src={data.logo} alt={data.name} className="w-14 h-14 rounded-xl object-contain border" />
           ) : (
-             <div className={`w-14 h-14 rounded-xl ${logoColor} flex items-center justify-center text-white font-bold text-xl shadow-md shrink-0`}>
+             <div className={`w-14 h-14 rounded-xl ${logoColor} flex items-center justify-center text-primary-foreground font-bold text-xl shadow-md shrink-0`}>
                {data.name.charAt(0)}
              </div>
           )}
-          
+
           <div>
             <CardTitle className="text-lg font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2">
               {data.name}
@@ -41,14 +41,14 @@ export function OrganizationCard({ data }: OrganizationCardProps) {
           </div>
         </CardHeader>
 
-        <CardContent className="pb-4 text-sm text-foreground/80 flex-grow">
+        <CardContent className="pb-4 text-foreground/80 flex-grow text-sm">
           <p className="line-clamp-3 mb-4 min-h-[4.5em]">
             {data.description || "Описание отсутствует."}
           </p>
-          
+
           {/* Контакты / ИИН как теги */}
           <div className="flex flex-wrap gap-2 mb-4">
-             <Badge variant="secondary" className="font-normal text-xs bg-slate-100">
+             <Badge variant="secondary" className="font-normal text-xs bg-muted">
                ИИН: {data.iin}
              </Badge>
           </div>
@@ -60,11 +60,11 @@ export function OrganizationCard({ data }: OrganizationCardProps) {
 
         <CardFooter className="pt-0 mt-auto">
           {data.vacanciesCount && data.vacanciesCount > 0 ? (
-            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-white transition-colors">
+            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
               Подробнее [Количество вакансий: {data.vacanciesCount}]
             </Button>
           ) : (
-            <Button variant="ghost" disabled className="w-full bg-slate-50 text-muted-foreground">
+            <Button variant="ghost" disabled className="w-full bg-muted text-muted-foreground">
               Нет активных вакансий
             </Button>
           )}

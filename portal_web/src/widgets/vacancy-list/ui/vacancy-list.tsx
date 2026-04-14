@@ -75,9 +75,9 @@ export async function VacancyList({ searchParams }: VacancyListProps) {
   // Если ничего не найдено
   if (data.length === 0) {
     return (
-      <div className="text-center py-20 bg-slate-50 rounded-xl border border-dashed">
+      <div className="text-center py-20 bg-muted rounded-xl border border-dashed">
         <p className="text-muted-foreground text-lg">Ничего не найдено 🕵️‍♂️</p>
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-muted-foreground/60">
             {search ? `По запросу "${search}" нет результатов.` : "Измените параметры фильтров."}
         </p>
       </div>

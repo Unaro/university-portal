@@ -20,8 +20,8 @@ export function VacancyCreateView({ majors, skills }: VacancyCreateViewProps) {
         </Button>
       </Link>
 
-      <h1 className="text-3xl font-bold mb-2">Создание вакансии</h1>
-      <p className="text-gray-500 mb-8">
+      <h1 className="text-3xl font-bold mb-2 text-foreground">Создание вакансии</h1>
+      <p className="text-muted-foreground mb-8">
         Заполните параметры для автоматического подбора студентов.
       </p>
       

@@ -12,8 +12,8 @@ export function LogoutDropdownItem() {
   };
 
   return (
-    <DropdownMenuItem 
-      className="text-red-600 cursor-pointer focus:text-red-600 focus:bg-red-50"
+    <DropdownMenuItem
+      className="text-destructive cursor-pointer focus:text-destructive focus:bg-destructive/10"
       onClick={handleLogout}
     >
       <LogOut className="mr-2 h-4 w-4" />

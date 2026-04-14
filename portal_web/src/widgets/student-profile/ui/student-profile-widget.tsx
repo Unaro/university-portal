@@ -42,7 +42,7 @@ export function StudentProfileWidget({
   
   return (
     <Tabs defaultValue="profile" className="w-full">
-      <TabsList className="grid w-full grid-cols-3 mb-6 bg-slate-100 p-1 h-auto"> {/* grid-cols-3 */}
+      <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted p-1 h-auto"> {/* grid-cols-3 */}
         <TabsTrigger value="profile" className="py-2.5">Мои данные</TabsTrigger>
         <TabsTrigger value="activities" className="py-2.5">Мои отклики</TabsTrigger>
         <TabsTrigger value="resume" className="py-2.5">Мое резюме</TabsTrigger> {/* Новая кнопка */}

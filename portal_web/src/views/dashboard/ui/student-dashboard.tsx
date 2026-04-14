@@ -134,8 +134,8 @@ export async function StudentDashboard({ userId, filterType }: StudentDashboardP
       {/* СТАТИСТИКА */}
       <div className="grid grid-cols-3 gap-4 mb-4">
           <StatsCard icon={<FileText size={16} />} label="Всего заявок" value={studentStats.total} />
-          <StatsCard icon={<CheckCircle size={16} />} label="Приглашений" value={studentStats.approved} color="text-green-600" />
-          <StatsCard icon={<XCircle size={16} />} label="Отказов" value={studentStats.rejected} color="text-red-500" />
+          <StatsCard icon={<CheckCircle size={16} />} label="Приглашений" value={studentStats.approved} color="text-green-600 dark:text-green-400" />
+          <StatsCard icon={<XCircle size={16} />} label="Отказов" value={studentStats.rejected} color="text-destructive" />
       </div>
 
       {/* ФИЛЬТРЫ */}
@@ -147,8 +147,8 @@ export async function StudentDashboard({ userId, filterType }: StudentDashboardP
       
       {/* СПИСОК ВАКАНСИЙ */}
       {visibleVacancies.length === 0 ? (
-        <div className="p-10 text-center bg-gray-50 rounded border border-dashed">
-          <p className="text-gray-500">Нет подходящих вакансий. Проверьте профиль или фильтры.</p>
+        <div className="p-10 text-center bg-muted rounded border border-dashed">
+          <p className="text-muted-foreground">Нет подходящих вакансий. Проверьте профиль или фильтры.</p>
         </div>
       ) : (
         <div className="grid gap-6">
@@ -156,41 +156,41 @@ export async function StudentDashboard({ userId, filterType }: StudentDashboardP
             const application = myApplicationsMap.get(vac.id);
             const isApplied = !!application;
             const isHighMatch = vac.matchScore > 0 && vac.missingSkills === 0;
-            
+
             return (
-              <div key={vac.id} className={`bg-white p-6 rounded-lg shadow-sm border transition hover:shadow-md ${isHighMatch ? "border-l-4 border-l-green-500" : ""}`}>
+              <div key={vac.id} className={`bg-card p-6 rounded-lg shadow-sm border transition hover:shadow-md ${isHighMatch ? "border-l-4 border-l-green-500" : ""}`}>
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-xl font-bold text-slate-900">{vac.title}</h3>
-                      <Badge variant="outline" className="text-xs font-normal bg-slate-100">
+                      <h3 className="text-xl font-bold text-foreground">{vac.title}</h3>
+                      <Badge variant="outline" className="text-xs font-normal bg-muted">
                           {vac.type === 'job' ? 'Работа' : vac.type === 'internship' ? 'Стажировка' : 'Практика'}
                       </Badge>
-                      {vac.salary && <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200">{vac.salary}</Badge>}
+                      {vac.salary && <Badge className="bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 border-green-200 dark:border-green-800">{vac.salary}</Badge>}
                   </div>
                   {vac.requiredSkills.length > 0 && (
-                      <div className="text-xs font-medium px-2 py-1 bg-slate-50 rounded border text-slate-500 ml-2">
-                          Совпадение: <span className={isHighMatch ? "text-green-600 font-bold" : "text-blue-600"}>{vac.matchScore}/{vac.requiredSkills.length}</span>
+                      <div className="text-xs font-medium px-2 py-1 bg-muted rounded border text-muted-foreground ml-2">
+                          Совпадение: <span className={isHighMatch ? "text-green-600 dark:text-green-400 font-bold" : "text-primary"}>{vac.matchScore}/{vac.requiredSkills.length}</span>
                       </div>
                   )}
                 </div>
 
-                <p className="text-sm font-medium text-slate-600 mb-3 flex items-center gap-2">
+                <p className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
                   <span>🏢 {vac.organization.name}</span> • <span>Мин. курс: {vac.minCourse}</span>
                 </p>
-                <p className="text-slate-700 mb-4 line-clamp-3 text-sm">{vac.description}</p>
+                <p className="text-muted-foreground mb-4 line-clamp-3 text-sm">{vac.description}</p>
 
                 <div className="flex flex-col gap-4 mt-4 border-t pt-4">
                   {isApplied ? (
-                    <div className="bg-slate-50 p-3 rounded-md border border-slate-200 text-sm">
+                    <div className="bg-muted p-3 rounded-md border text-sm">
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-slate-600">Статус: {application?.status === 'approved' ? 'Приглашение!' : application?.status === 'rejected' ? 'Отказ' : 'На рассмотрении'}</span>
-                        {application?.status === 'approved' && <a href={`/api/documents/${application.id}`} target="_blank" className="text-blue-600 underline">Скачать направление</a>}
+                        <span className="font-semibold text-muted-foreground">Статус: {application?.status === 'approved' ? 'Приглашение!' : application?.status === 'rejected' ? 'Отказ' : 'На рассмотрении'}</span>
+                        {application?.status === 'approved' && <a href={`/api/documents/${application.id}`} target="_blank" className="text-primary underline">Скачать направление</a>}
                       </div>
-                      {application?.responseMessage && <div className="mt-2 text-slate-700 italic">“{application.responseMessage}”</div>}
+                      {application?.responseMessage && <div className="mt-2 text-muted-foreground italic">"{application.responseMessage}"</div>}
                     </div>
                   ) : (
                     <div className="flex justify-between items-center w-full">
-                        <span className="text-xs text-slate-400">{vac.createdAt ? new Date(vac.createdAt).toLocaleDateString("ru-RU") : "Недавно"}</span>
+                        <span className="text-xs text-muted-foreground">{vac.createdAt ? new Date(vac.createdAt).toLocaleDateString("ru-RU") : "Недавно"}</span>
                         <form action={async () => { "use server"; await applyToVacancy(vac.id); }}>
                           {/* Проверка на null для studentProfile */}
                           <Button type="submit" disabled={!studentProfile || (studentProfile.skills.length === 0 && vac.requiredSkills.length > 0)}>Откликнуться</Button>
@@ -206,7 +206,7 @@ export async function StudentDashboard({ userId, filterType }: StudentDashboardP
                       }}
                       className="mt-2"
                     >
-                      <Button variant="link" size="sm" className="text-red-500 h-auto p-0 text-xs">
+                      <Button variant="link" size="sm" className="text-destructive h-auto p-0 text-xs">
                         Отозвать заявку
                       </Button>
                     </form>
@@ -230,12 +230,12 @@ interface StatsCardProps {
   color?: string;
 }
 
-function StatsCard({ icon, label, value, color = "text-slate-900" }: StatsCardProps) {
+function StatsCard({ icon, label, value, color = "text-foreground" }: StatsCardProps) {
   return (
     <Card>
       <CardContent className="p-4 flex flex-col items-center justify-center text-center">
           <div className={`text-2xl font-bold ${color}`}>{value}</div>
-          <div className="text-xs text-slate-500 flex items-center gap-1 mt-1">{icon} {label}</div>
+          <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">{icon} {label}</div>
       </CardContent>
     </Card>
   )

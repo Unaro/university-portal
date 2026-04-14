@@ -45,7 +45,7 @@ export async function OrganizationList({ searchQuery }: OrganizationListProps) {
     return (
       <div className="text-center py-20">
         <h3 className="text-xl font-semibold text-muted-foreground">Компании не найдены 🏢</h3>
-        <p className="text-sm text-gray-400 mt-2">Попробуйте изменить запрос</p>
+        <p className="text-sm text-muted-foreground/60 mt-2">Попробуйте изменить запрос</p>
       </div>
     );
   }

@@ -4,7 +4,7 @@ import type { VacancyDetailsProps } from "@/widgets/vacancy-details/ui/vacancy-d
 
 export function PracticeDetailsView(props: VacancyDetailsProps) {
   return (
-    <div className="min-h-screen bg-slate-50 pb-10">
+    <div className="min-h-screen bg-background pb-10">
       <div className="container mx-auto px-4 py-8">
         <VacancyDetails {...props} />
       </div>

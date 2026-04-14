@@ -114,11 +114,11 @@ function PartnerRegisterForm() {
 export function RegisterForm() {
   return (
     <Tabs defaultValue="student" className="w-full">
-      <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-slate-100 mb-8">
-        <TabsTrigger value="student" className="py-3 gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all">
+      <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted mb-8">
+        <TabsTrigger value="student" className="py-3 gap-2 data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all">
           <GraduationCap className="h-4 w-4" /> Студент
         </TabsTrigger>
-        <TabsTrigger value="partner" className="py-3 gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all">
+        <TabsTrigger value="partner" className="py-3 gap-2 data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all">
           <Building2 className="h-4 w-4" /> Партнер
         </TabsTrigger>
         <TabsTrigger value="staff" disabled className="py-3 gap-2 opacity-50 cursor-not-allowed">

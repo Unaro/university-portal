@@ -13,18 +13,18 @@ interface HomeViewProps {
 
 export function HomeView({ stats, latestVacancies }: HomeViewProps) {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="min-h-screen bg-background flex flex-col font-sans">
 
       <Hero stats={stats} />
       <Features />
 
       {/* Свежие вакансии */}
-      <section className="py-20 bg-slate-50">
+      <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-end mb-8">
             <div>
-              <h2 className="text-3xl font-bold text-slate-900">Свежие предложения</h2>
-              <p className="text-slate-500 mt-2">Успейте откликнуться первыми</p>
+              <h2 className="text-3xl font-bold text-foreground">Свежие предложения</h2>
+              <p className="text-muted-foreground mt-2">Успейте откликнуться первыми</p>
             </div>
             <Link href="/practices" className="hidden sm:block">
               <Button variant="outline">Все вакансии <ArrowRight size={16} className="ml-2"/></Button>

@@ -14,21 +14,21 @@ export function MaterialRow({ data }: MaterialRowProps) {
   const isPdf = data.fileUrl.endsWith(".pdf");
   
   let Icon = File;
-  let iconColor = "text-gray-500";
-  let bgColor = "bg-gray-100";
+  let iconColor = "text-muted-foreground";
+  let bgColor = "bg-muted";
 
   if (isPdf) {
     Icon = FileBadge;
     iconColor = "text-red-500";
-    bgColor = "bg-red-50";
+    bgColor = "bg-red-50 dark:bg-red-900/20";
   } else {
     Icon = FileText;
-    iconColor = "text-blue-500";
-    bgColor = "bg-blue-50";
+    iconColor = "text-primary";
+    bgColor = "bg-primary/10";
   }
 
   return (
-    <div className="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-200 group">
+    <div className="flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors border border-transparent hover:border-border group">
       <div className="flex items-center gap-4">
         {/* Иконка */}
         <div className={`w-10 h-10 rounded-lg ${bgColor} flex items-center justify-center shrink-0`}>
@@ -56,11 +56,11 @@ export function MaterialRow({ data }: MaterialRowProps) {
       <div>
         <a href={data.downloadUrl || "#"} target="_blank" rel="noreferrer">
             {isPdf ? (
-            <Button variant="outline" size="sm" className="gap-2 hover:bg-red-50 hover:text-red-600 hover:border-red-200">
+            <Button variant="outline" size="sm" className="gap-2 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 hover:border-red-200 dark:hover:border-red-800">
                 <Eye className="h-4 w-4" /> <span className="hidden sm:inline">Открыть</span>
             </Button>
             ) : (
-            <Button variant="outline" size="sm" className="gap-2 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200">
+            <Button variant="outline" size="sm" className="gap-2 hover:bg-primary/10 hover:text-primary hover:border-primary/30">
                 <Download className="h-4 w-4" /> <span className="hidden sm:inline">Скачать</span>
             </Button>
             )}

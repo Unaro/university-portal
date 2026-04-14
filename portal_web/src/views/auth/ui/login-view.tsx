@@ -5,7 +5,7 @@ import { LoginForm } from "@/features/auth/ui/login-form";
 
 export function LoginView() {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       <div className="flex-grow flex items-center justify-center px-4 py-10">
         <Card className="w-full max-w-md shadow-2xl border-t-4 border-t-primary">
           <CardHeader className="space-y-1 text-center">
@@ -17,7 +17,7 @@ export function LoginView() {
           <CardContent>
             <LoginForm />
           </CardContent>
-          <CardFooter className="flex flex-col gap-4 bg-slate-50 p-6 text-center text-sm text-muted-foreground border-t">
+          <CardFooter className="flex flex-col gap-4 bg-muted p-6 text-center text-sm text-muted-foreground border-t">
             <div>
               Еще нет аккаунта?{" "}
               <Link href="/register" className="font-bold text-primary hover:underline">

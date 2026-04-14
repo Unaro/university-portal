@@ -15,7 +15,7 @@ export async function PartnerDashboard({ userId }: { userId: number }) {
     with: { organization: true },
   });
   
-  if (!rep) return <div className="p-4 bg-yellow-100 rounded text-yellow-800">Организация не найдена. <Link href="/dashboard/register-org" className="underline">Зарегистрировать</Link></div>;
+  if (!rep) return <div className="p-4 bg-yellow-100 dark:bg-yellow-900/20 rounded text-yellow-800 dark:text-yellow-400">Организация не найдена. <Link href="/dashboard/register-org" className="underline">Зарегистрировать</Link></div>;
 
   const myOrg = rep.organization;
 
@@ -30,9 +30,9 @@ export async function PartnerDashboard({ userId }: { userId: number }) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-lg shadow border">
+      <div className="bg-card p-6 rounded-lg shadow border">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Вакансии компании &quot;{myOrg.name}&quot;</h2>
+          <h2 className="text-xl font-semibold text-foreground">Вакансии компании &quot;{myOrg.name}&quot;</h2>
           <div className="flex gap-2">
               <Link href="/dashboard/organization"><Button variant="outline" size="icon" title="Настройки">⚙️</Button></Link>
               <Link href="/dashboard/applications"><Button variant="secondary">Посмотреть заявки</Button></Link>
@@ -41,7 +41,7 @@ export async function PartnerDashboard({ userId }: { userId: number }) {
         </div>
 
         {myVacancies.length === 0 ? (
-          <div className="text-center py-10 text-gray-500 border border-dashed rounded-lg">
+          <div className="text-center py-10 text-muted-foreground border border-dashed rounded-lg">
             <p>У вас пока нет активных вакансий.</p>
             <p className="text-sm">Создайте первую вакансию, чтобы начать поиск студентов.</p>
           </div>
@@ -52,31 +52,31 @@ export async function PartnerDashboard({ userId }: { userId: number }) {
               const newApps = vac.applications.filter(a => a.status === 'pending').length;
 
               return (
-                <div key={vac.id} className="p-4 border rounded bg-slate-50 hover:bg-slate-100 transition">
+                <div key={vac.id} className="p-4 border rounded bg-muted hover:bg-muted/80 transition">
                   <div className="flex justify-between items-start">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-bold text-lg">{vac.title}</h3>
-                        <Badge variant="outline" className="text-xs bg-white">
+                        <h3 className="font-bold text-lg text-foreground">{vac.title}</h3>
+                        <Badge variant="outline" className="text-xs bg-card">
                           {vac.type === 'job' ? 'Работа' : vac.type === 'internship' ? 'Стажировка' : 'Практика'}
                         </Badge>
                       </div>
-                      <p className="text-sm text-gray-600 line-clamp-1 mb-3">{vac.description}</p>
-                      
+                      <p className="text-sm text-muted-foreground line-clamp-1 mb-3">{vac.description}</p>
+
                       <div className="flex gap-4 text-sm">
-                          <div className="flex items-center gap-1 text-slate-700" title="Всего откликов">
+                          <div className="flex items-center gap-1 text-muted-foreground" title="Всего откликов">
                             <Users size={16} /> <span className="font-medium">{totalApps}</span> кандидатов
                           </div>
                           {newApps > 0 && (
-                            <div className="flex items-center gap-1 text-orange-600 font-bold bg-orange-50 px-2 py-0.5 rounded-full text-xs">
+                            <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400 font-bold bg-orange-50 dark:bg-orange-900/20 px-2 py-0.5 rounded-full text-xs">
                               <Clock size={14} /> <span>{newApps} новых</span>
                             </div>
                           )}
                       </div>
                     </div>
-                    
+
                     <div className="text-right flex flex-col gap-2">
-                        <div className="text-sm text-green-600 font-medium flex items-center justify-end gap-1">
+                        <div className="text-sm text-green-600 dark:text-green-400 font-medium flex items-center justify-end gap-1">
                           <CheckCircle size={14} /> Активна
                         </div>
                         <Link href="/dashboard/applications">
@@ -88,7 +88,7 @@ export async function PartnerDashboard({ userId }: { userId: number }) {
                             await deleteVacancy(vac.id);
                           }}
                         >
-                          <Button variant="ghost" size="sm" className="h-8 w-full text-red-500 hover:text-red-700 hover:bg-red-50 gap-2">
+                          <Button variant="ghost" size="sm" className="h-8 w-full text-destructive hover:text-destructive hover:bg-destructive/10 gap-2">
                             <Trash2 size={14} /> Удалить
                           </Button>
                         </form>

@@ -54,41 +54,41 @@ export async function AdminView() {
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
           <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-sm text-gray-500">Студентов</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Студентов</CardTitle></CardHeader>
             <CardContent><div className="text-2xl font-bold">{stats.totalStudents}</div></CardContent>
           </Card>
           <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-sm text-gray-500">Компаний</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Компаний</CardTitle></CardHeader>
             <CardContent><div className="text-2xl font-bold">{stats.totalCompanies}</div></CardContent>
           </Card>
           <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-sm text-gray-500">Заявок</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Заявок</CardTitle></CardHeader>
             <CardContent><div className="text-2xl font-bold">{stats.totalApplications}</div></CardContent>
           </Card>
-          <Card className="bg-green-50 border-green-100">
-            <CardHeader className="pb-2"><CardTitle className="text-sm text-green-700">Трудоустроено</CardTitle></CardHeader>
+          <Card className="bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800">
+            <CardHeader className="pb-2"><CardTitle className="text-sm text-green-700 dark:text-green-400">Трудоустроено</CardTitle></CardHeader>
             <CardContent>
-                <div className="text-2xl font-bold text-green-700">{stats.successfulHires}</div>
+                <div className="text-2xl font-bold text-green-700 dark:text-green-400">{stats.successfulHires}</div>
             </CardContent>
           </Card>
         </div>
       )}
 
       <div className="space-y-6">
-        <h2 className="text-xl font-semibold">Заявки организаций</h2>
+        <h2 className="text-xl font-semibold text-foreground">Заявки организаций</h2>
         {orgsWithLogos.length === 0 ? (
-          <div className="p-10 bg-gray-50 text-gray-500 rounded border border-dashed text-center">
+          <div className="p-10 bg-muted text-muted-foreground rounded border border-dashed text-center">
             Все заявки обработаны.
           </div>
         ) : (
           <div className="grid gap-6">
             {orgsWithLogos.map((org) => (
                <Card key={org.id} className="overflow-hidden">
-                  <CardHeader className="bg-gray-50 border-b pb-4">
+                  <CardHeader className="bg-muted border-b pb-4">
                       <div className="flex justify-between items-start">
                         <div>
                             <CardTitle>{org.name}</CardTitle>
-                            <p className="text-sm text-gray-500 mt-1">ИИН: {org.iin}</p>
+                            <p className="text-sm text-muted-foreground mt-1">ИИН: {org.iin}</p>
                         </div>
                         {org.logoUrl && (
                             // eslint-disable-next-line @next/next/no-img-element
@@ -107,7 +107,7 @@ export async function AdminView() {
                                <Button variant="destructive">Отклонить</Button>
                             </form>
                             <form action={async () => { "use server"; await verifyOrganization(org.id, "approved"); }}>
-                               <Button className="bg-green-600">Одобрить</Button>
+                               <Button className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-400">Одобрить</Button>
                             </form>
                         </div>
                      </div>

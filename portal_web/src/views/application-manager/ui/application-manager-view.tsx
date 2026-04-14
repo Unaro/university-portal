@@ -18,14 +18,14 @@ export async function ApplicationManagerView({ searchParams }: PageProps) {
   const currentStatus = searchParams?.status || "all";
 
   return (
-    <div className="p-6 md:p-10 max-w-7xl mx-auto bg-slate-50/50 min-h-screen">
+    <div className="p-6 md:p-10 max-w-7xl mx-auto bg-background min-h-screen">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <Link href="/dashboard" className="text-sm text-slate-500 hover:text-blue-600 flex items-center gap-1 mb-2 transition-colors">
+          <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-primary flex items-center gap-1 mb-2 transition-colors">
             <ArrowLeft size={14} /> Назад в дашборд
           </Link>
-          <h1 className="text-3xl font-bold text-slate-900">Управление откликами</h1>
-          <p className="text-slate-500 mt-1">Просматривайте кандидатов и принимайте решения</p>
+          <h1 className="text-3xl font-bold text-foreground">Управление откликами</h1>
+          <p className="text-muted-foreground mt-1">Просматривайте кандидатов и принимайте решения</p>
         </div>
       </div>
 

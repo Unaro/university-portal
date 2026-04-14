@@ -63,14 +63,14 @@ export function VacancyFilter() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Поиск по названию..."
-          className="pl-10 bg-white"
+          className="pl-10 bg-card"
           defaultValue={searchParams.get("search")?.toString()}
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
 
       {/* САЙДБАР С ФИЛЬТРАМИ (Desktop) */}
-      <Card className="p-4 border-muted bg-slate-50/50 hidden lg:block">
+      <Card className="p-4 border-muted bg-muted/50 hidden lg:block">
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-semibold flex items-center gap-2"><Filter className="h-4 w-4" /> Фильтры</h3>
           <Button variant="ghost" size="sm" className="h-auto px-2 text-xs text-muted-foreground hover:text-destructive" onClick={resetFilters}>Сбросить</Button>

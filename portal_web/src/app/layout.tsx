@@ -20,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru" className="h-full">
-      <body className={`${inter.className} flex flex-col min-h-screen bg-slate-50`}>
+    <html lang="ru" className="h-full" suppressHydrationWarning>
+      <body className={`${inter.className} flex flex-col min-h-screen bg-background`}>
         <Providers> {/* <--- ОБЕРТКА */}
           <Header />
           

@@ -26,10 +26,10 @@ export function ProfileSidebar({ user, details }: ProfileSidebarProps) {
   return (
     <Card className="shadow-md border-t-4 border-t-primary text-center h-fit">
       <CardContent className="pt-6 flex flex-col items-center">
-        <div className="w-24 h-24 rounded-full bg-slate-100 flex items-center justify-center mb-4 border-4 border-white shadow-sm overflow-hidden">
+        <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-4 border-4 border-card shadow-sm overflow-hidden">
           <Avatar className="w-full h-full">
             <AvatarImage src={user.image || ""} />
-            <AvatarFallback className="text-2xl font-bold text-primary bg-slate-100">
+            <AvatarFallback className="text-2xl font-bold text-primary bg-muted">
               {initials}
             </AvatarFallback>
           </Avatar>

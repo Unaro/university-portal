@@ -64,10 +64,10 @@ export async function ApplicationManager({ userId, statusFilter }: ApplicationMa
   return (
     <div>
       {/* Сводка (Header widget logic part) */}
-      <div className="flex gap-4 bg-white p-3 rounded-lg border shadow-sm mb-8 w-fit ml-auto md:ml-0">
-           <div className="text-center px-2 border-r"><div className="text-2xl font-bold">{stats.total}</div><div className="text-xs text-slate-500 uppercase">Всего</div></div>
-           <div className="text-center px-2 border-r"><div className="text-2xl font-bold text-orange-600">{stats.pending}</div><div className="text-xs text-slate-500 uppercase">Ждут</div></div>
-           <div className="text-center px-2"><div className="text-2xl font-bold text-green-600">{stats.approved}</div><div className="text-xs text-slate-500 uppercase">Принято</div></div>
+      <div className="flex gap-4 bg-card p-3 rounded-lg border shadow-sm mb-8 w-fit ml-auto md:ml-0">
+           <div className="text-center px-2 border-r"><div className="text-2xl font-bold">{stats.total}</div><div className="text-xs text-muted-foreground uppercase">Всего</div></div>
+           <div className="text-center px-2 border-r"><div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.pending}</div><div className="text-xs text-muted-foreground uppercase">Ждут</div></div>
+           <div className="text-center px-2"><div className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.approved}</div><div className="text-xs text-muted-foreground uppercase">Принято</div></div>
       </div>
 
       {/* Табы */}
@@ -80,30 +80,30 @@ export async function ApplicationManager({ userId, statusFilter }: ApplicationMa
 
       {/* Список */}
       {filteredApps.length === 0 ? (
-        <div className="text-center py-20 bg-white border border-dashed rounded-xl">
-          <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300"><Briefcase size={32} /></div>
-          <h3 className="text-lg font-medium text-slate-900">Список пуст</h3>
+        <div className="text-center py-20 bg-card border border-dashed rounded-xl">
+          <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4 text-muted-foreground"><Briefcase size={32} /></div>
+          <h3 className="text-lg font-medium text-foreground">Список пуст</h3>
         </div>
       ) : (
         <div className="grid gap-6">
           {filteredApps.map((app) => (
-            <ApplicationCard 
-              key={app.id} 
-              data={app} 
+            <ApplicationCard
+              key={app.id}
+              data={app}
               actionSlot={
                 app.status === "pending" ? (
                   <ApplicationResponseForm applicationId={app.id} />
                 ) : (
                   <div className="h-full flex flex-col">
                       <div className={`mb-4 flex items-center gap-2 font-bold text-sm px-3 py-2 rounded-md w-fit
-                         ${app.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                         ${app.status === 'approved' ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'}`}>
                          {app.status === 'approved' ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
                          {app.status === 'approved' ? 'Вы пригласили' : 'Вы отказали'}
                       </div>
                       <div className="flex-grow">
-                         <p className="text-xs font-semibold text-slate-500 uppercase mb-2">Ваш ответ:</p>
-                         <div className="bg-white border rounded-lg p-3 text-sm text-slate-700 italic relative">
-                            <div className="absolute -top-1.5 left-4 w-3 h-3 bg-white border-t border-l transform rotate-45"></div>
+                         <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Ваш ответ:</p>
+                         <div className="bg-card border rounded-lg p-3 text-sm text-muted-foreground italic relative">
+                            <div className="absolute -top-1.5 left-4 w-3 h-3 bg-card border-t border-l transform rotate-45"></div>
                             &ldquo;{app.responseMessage}&rdquo;
                          </div>
                       </div>
