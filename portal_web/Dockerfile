@@ -65,9 +65,11 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/src ./src
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle.config.ts ./
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./
-COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
+# COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
+
 # Копируем node_modules со стадии seeder
 COPY --from=seeder /app/node_modules ./node_modules
+COPY drizzle ./drizzle
 
 USER nextjs
 

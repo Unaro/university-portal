@@ -38,9 +38,10 @@ export interface VacancyDetailsProps {
   };
   isApplied: boolean;
   canApply: boolean; // Проверка профиля студента
+  isLoggined: boolean;
 }
 
-export function VacancyDetails({ data, isApplied, canApply }: VacancyDetailsProps) {
+export function VacancyDetails({ data, isApplied, canApply, isLoggined }: VacancyDetailsProps) {
   // Разбираем требования на список (если они разделены новой строкой)
   const requirementsList = data.requirements 
     ? data.requirements.split('\n').filter(Boolean) 
@@ -65,7 +66,6 @@ export function VacancyDetails({ data, isApplied, canApply }: VacancyDetailsProp
               <div className="flex flex-wrap gap-4 text-muted-foreground mb-6">
                  <div className="flex items-center gap-2 font-medium text-primary bg-card px-3 py-1 rounded-full border shadow-sm">
                     {data.organization.logoUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
                         <img src={data.organization.logoUrl} alt="Logo" className="w-5 h-5 object-contain" />
                     ) : (
                         <Building2 className="h-4 w-4" />
@@ -98,8 +98,9 @@ export function VacancyDetails({ data, isApplied, canApply }: VacancyDetailsProp
                     {data.salary}
                   </span>
               )}
-
-              <div className="w-full flex flex-col gap-2">
+              
+              {isLoggined && (
+                <div className="w-full flex flex-col gap-2">
                   <ApplyButton
                     vacancyId={data.id}
                     isApplied={isApplied}
@@ -108,7 +109,9 @@ export function VacancyDetails({ data, isApplied, canApply }: VacancyDetailsProp
                   {!canApply && !isApplied && (
                       <p className="text-xs text-destructive text-center">Заполните профиль для отклика</p>
                   )}
-              </div>
+                </div>
+              )}
+
             </div>
           </div>
         </div>

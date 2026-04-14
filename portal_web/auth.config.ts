@@ -10,16 +10,16 @@ export const authConfig = {
       const isLoggedIn = !!auth?.user;
       const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
       const isOnProfile = nextUrl.pathname.startsWith("/profile");
-      const isOnOrganizations = nextUrl.pathname.startsWith("/organizations");
+      const isOnOrganizations = nextUrl.pathname.startsWith("/organizations/");
       const isOnPractices = nextUrl.pathname.startsWith("/practices");
 
       // Публичные страницы доступны всем
-      if (nextUrl.pathname === "/" || nextUrl.pathname === "/login" || nextUrl.pathname === "/register") {
+      if (nextUrl.pathname === "/" || nextUrl.pathname === "/login" || nextUrl.pathname === "/register" || isOnPractices) {
         return true;
       }
 
       // Защищённые роуты требуют авторизации
-      if (isOnDashboard || isOnProfile || isOnOrganizations || isOnPractices) {
+      if (isOnDashboard || isOnProfile || isOnOrganizations) {
         if (isLoggedIn) return true;
         return false; // Редирект на /login (указан в pages.signIn)
       }

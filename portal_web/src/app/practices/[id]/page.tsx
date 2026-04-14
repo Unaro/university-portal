@@ -31,9 +31,10 @@ export default async function PracticeDetailsPage({ params }: PageProps) {
 
   if (!vacancy) notFound();
 
-  // 2. Проверяем статус отклика и возможность откликнуться
+  // 2. Проверяем статус отклика и возможность откликнуться, а так же залогинен ли сам пользователь
   let isApplied = false;
   let canApply = false;
+  let isLoggined = false;
 
   if (session?.user?.id && session.user.role === "student") {
     const studentId = parseInt(session.user.id);
@@ -54,7 +55,7 @@ export default async function PracticeDetailsPage({ params }: PageProps) {
       });
       
       isApplied = !!application;
-      
+      isLoggined = true
       // Проверка на возможность отклика (заполнены навыки)
       canApply = studentProfile.skills.length > 0;
     }
@@ -80,6 +81,7 @@ export default async function PracticeDetailsPage({ params }: PageProps) {
       data={formattedData}
       isApplied={isApplied}
       canApply={canApply}
+      isLoggined={isLoggined}
     />
   );
 }
