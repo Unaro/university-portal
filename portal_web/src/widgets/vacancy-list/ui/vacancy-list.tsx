@@ -4,6 +4,8 @@ import { vacancies } from "@/db/schema";
 import { eq, and, desc, gte, inArray, isNotNull } from "drizzle-orm"; // Убрали like
 import { VacancyCard } from "@/entities/vacancy/ui/vacancy-card";
 
+type InternshipType = "practice" | "internship" | "job";
+
 interface VacancyListProps {
   searchParams: {
     search?: string;
@@ -25,9 +27,12 @@ export async function VacancyList({ searchParams }: VacancyListProps) {
 
   // Тип
   if (type) {
-    const types = type.split(",");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    filters.push(inArray(vacancies.type, types as any));
+    const types = type.split(",").filter((t): t is InternshipType =>
+      ["practice", "internship", "job"].includes(t)
+    );
+    if (types.length > 0) {
+      filters.push(inArray(vacancies.type, types));
+    }
   }
 
   // Оплата

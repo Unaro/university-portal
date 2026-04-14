@@ -1,7 +1,7 @@
 // src/app/dashboard/organization/settings-form.tsx
 "use client";
 
-import { useActionState, useEffect } from "react"; // <--- useEffect
+import { useActionState, useEffect } from "react";
 import { updateOrganization, OrgSettingsState } from "@/app/actions/organization-settings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,10 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import { toast } from "sonner"; // <--- Toast
+import { toast } from "sonner";
+import type { Organization } from "@/shared/types/db";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function OrgSettingsForm({ initialData }: { initialData: any }) {
+export function OrgSettingsForm({ initialData }: { initialData: Organization }) {
   const initialState: OrgSettingsState = { success: false, message: "" };
   const [state, dispatch, isPending] = useActionState(updateOrganization, initialState);
 
@@ -39,7 +39,7 @@ export function OrgSettingsForm({ initialData }: { initialData: any }) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="contacts">Контакты</Label>
-            <Input id="contacts" name="contacts" defaultValue={initialData.contacts} required />
+            <Input id="contacts" name="contacts" defaultValue={initialData.contacts ?? ""} required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="website">Веб-сайт</Label>

@@ -4,10 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mail, Phone, GraduationCap, Building2 } from "lucide-react";
 import { LogoutButton } from "@/features/auth/ui/logout-button";
-import { User } from "@/shared/types/db"; // <--- Импорт типа
+import type { SessionUser } from "@/views/profile/ui/profile-view";
 
 interface ProfileSidebarProps {
-  user: User; // Строгий тип User из БД
+  user: SessionUser;
   details?: {
     group?: string | null;
     phone?: string | null;

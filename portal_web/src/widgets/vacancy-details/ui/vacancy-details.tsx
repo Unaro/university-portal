@@ -18,7 +18,7 @@ import { ApplyButton } from "@/features/apply-vacancy/ui/apply-button";
 import { getFileUrl } from "@/lib/s3";
 
 // Типы пропсов (данные, которые придут из Page)
-interface VacancyDetailsProps {
+export interface VacancyDetailsProps {
   data: {
     id: number;
     title: string;

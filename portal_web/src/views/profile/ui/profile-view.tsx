@@ -1,12 +1,21 @@
 // src/views/profile/ui/profile-view.tsx
 import { ProfileSidebar } from "@/entities/session/ui/profile-sidebar";
 import { StudentProfileWidget } from "@/widgets/student-profile/ui/student-profile-widget";
-import { User, StudentWithSkills, Major, Skill, Resume } from "@/shared/types/db";
+import { StudentWithSkills, Major, Skill, Resume } from "@/shared/types/db";
 import { ApplicationUiItem } from "@/features/application-list/ui/student-application-list";
 
+/** Тип пользователя из NextAuth сессии (не из БД) */
+export type SessionUser = {
+  id: string;
+  role: "student" | "university_staff" | "organization_representative" | "admin";
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+};
+
 interface ProfileViewProps {
-  user: User;
-  studentData: StudentWithSkills | null; // Может быть null, если профиль не создан
+  user: SessionUser;
+  studentData: StudentWithSkills | null;
   majors: Major[];
   skills: Skill[];
   resumeData: Resume | null;

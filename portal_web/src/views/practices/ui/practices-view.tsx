@@ -1,11 +1,15 @@
 // src/views/practices/ui/practices-view.tsx
-import { Suspense } from "react"; // <--- Импорт
+import { Suspense } from "react";
 import { VacancyList } from "@/widgets/vacancy-list/ui/vacancy-list";
 import { VacancyFilter } from "@/features/vacancy-filter/ui/vacancy-filter";
 
 interface PracticesViewProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  searchParams: any;
+  searchParams: {
+    search?: string;
+    type?: string;
+    payment?: string;
+    course?: string;
+  };
 }
 
 export function PracticesView({ searchParams }: PracticesViewProps) {
