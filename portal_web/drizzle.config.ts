@@ -2,7 +2,6 @@ import { defineConfig } from "drizzle-kit";
 import * as dotenv from "dotenv";
 import { join } from "path";
 
-// Загружаем .env из корня проекта (parent directory)
 dotenv.config({ path: join(__dirname, "../.env") });
 
 const connectionString = process.env.DATABASE_URL;

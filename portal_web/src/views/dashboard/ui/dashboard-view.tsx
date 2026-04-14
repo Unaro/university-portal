@@ -2,8 +2,8 @@
 import { auth, signOut } from "@/auth";
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
-import { StudentDashboard } from "./student-dashboard"; // Мы создадим это
-import { PartnerDashboard } from "./partner-dashboard"; // И это
+import { StudentDashboard } from "./student-dashboard";
+import { PartnerDashboard } from "./partner-dashboard";
 import Link from "next/link";
 
 interface DashboardViewProps {
@@ -19,7 +19,6 @@ export async function DashboardView({ searchParams }: DashboardViewProps) {
 
   const userRole = session.user.role;
   const userId = parseInt(session.user.id);
-  const filterType = searchParams?.filter || "all";
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl min-h-screen">
@@ -38,7 +37,7 @@ export async function DashboardView({ searchParams }: DashboardViewProps) {
 
       {/* РОУТИНГ ПО РОЛЯМ */}
       {userRole === "student" && (
-        <StudentDashboard userId={userId} filterType={filterType} />
+        <StudentDashboard userId={userId} />
       )}
 
       {userRole === "organization_representative" && (

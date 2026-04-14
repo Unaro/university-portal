@@ -1,228 +1,111 @@
 // src/views/dashboard/ui/student-dashboard.tsx
 import { db } from "@/db";
-import { students, vacancies, organizations, applications, studentSkills } from "@/db/schema";
+import { students, applications, vacancies, organizations } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { FileText, CheckCircle, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { applyToVacancy, deleteApplication } from "@/app/actions/application";
+import {
+  FileText,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Building2,
+  CalendarDays,
+  Briefcase,
+  GraduationCap,
+  BookOpen,
+  Coins,
+  Download,
+  Search,
+  Undo2,
+} from "lucide-react";
+import { deleteApplication } from "@/app/actions/application";
 import { ReactNode } from "react";
 
-// --- ТИПИЗАЦИЯ ---
+export const dynamic = 'force-dynamic';
 
-// 1. Тип "Умной вакансии" (Данные из БД + Связи + Вычисляемые поля)
-// Мы используем $inferSelect, чтобы взять типы прямо из схемы Drizzle
-type SmartVacancy = typeof vacancies.$inferSelect & {
-  organization: typeof organizations.$inferSelect;
-  // Связи many-to-many возвращают массив объектов связующей таблицы
-  requiredSkills: (typeof import("@/db/schema").vacancySkills.$inferSelect)[];
-  allowedMajors: (typeof import("@/db/schema").vacancyAllowedMajors.$inferSelect)[];
-  // Вычисляемые поля для UI
-  matchScore: number;
-  missingSkills: number;
-};
-
-// 2. Тип Профиля студента
-type StudentProfile = typeof students.$inferSelect & {
-  skills: (typeof studentSkills.$inferSelect)[];
+type ApplicationWithDetails = typeof applications.$inferSelect & {
+  vacancy: typeof vacancies.$inferSelect & {
+    organization: typeof organizations.$inferSelect;
+  };
 };
 
 interface StudentDashboardProps {
   userId: number;
-  filterType: string;
 }
 
-export async function StudentDashboard({ userId, filterType }: StudentDashboardProps) {
-  // 1. Загружаем профиль
+export async function StudentDashboard({ userId }: StudentDashboardProps) {
   const studentProfile = await db.query.students.findFirst({
     where: eq(students.userId, userId),
-    with: { skills: true }
-  }) as StudentProfile | undefined; // Явно указываем тип результата
+  });
 
-  const studentStats = { total: 0, pending: 0, approved: 0, rejected: 0 };
-  const myApplicationsMap = new Map<number, typeof applications.$inferSelect>();
-
-  // 2. Инициализируем переменную строго типизированным массивом
-  let visibleVacancies: SmartVacancy[] = [];
-
-  if (studentProfile) {
-    const studentSkillSet = new Set(studentProfile.skills.map(s => s.skillId));
-
-    // Drizzle возвращает сырые данные, которые мы потом обогатим
-    const allVacanciesRaw = await db.query.vacancies.findMany({
-      where: eq(vacancies.isActive, true),
-      with: { 
-        organization: true,
-        requiredSkills: true,
-        allowedMajors: true
-      },
-    });
-
-    // Фильтрация и маппинг в SmartVacancy
-    visibleVacancies = allVacanciesRaw
-      .filter((vac) => {
-        if (filterType !== "all") {
-            if (filterType === 'practice' && vac.type !== 'practice') return false;
-            if (filterType === 'job' && vac.type === 'practice') return false;
-        }
-        if (studentProfile!.course && studentProfile!.course < (vac.minCourse || 1)) return false;
-        if (vac.allowedMajors.length > 0) {
-          const isMajorAllowed = vac.allowedMajors.some(m => m.majorId === studentProfile!.majorId);
-          if (!isMajorAllowed) return false;
-        }
-        return true;
-      })
-      .map((vac) => {
-        let matchCount = 0;
-        vac.requiredSkills.forEach((req) => {
-          if (studentSkillSet.has(req.skillId)) matchCount++;
-        });
-        
-        // Возвращаем объект, полностью соответствующий типу SmartVacancy
-        return {
-          ...vac,
-          matchScore: matchCount,
-          missingSkills: vac.requiredSkills.length - matchCount 
-        };
-      })
-      .sort((a, b) => {
-        if (b.matchScore !== a.matchScore) {
-          return b.matchScore - a.matchScore;
-        }
-        // Обработка возможного null в дате (хотя defaultNow() обычно гарантирует дату, но TS может ругаться)
-        const dateA = a.createdAt ? a.createdAt.getTime() : 0;
-        const dateB = b.createdAt ? b.createdAt.getTime() : 0;
-        return dateB - dateA;
-      });
-
-    // Загрузка заявок
-    const myApps = await db.query.applications.findMany({
-      where: eq(applications.studentId, studentProfile.id),
-    });
-    
-    myApps.forEach(app => {
-      myApplicationsMap.set(app.vacancyId, app);
-      studentStats.total++;
-      if (app.status === 'pending') studentStats.pending++;
-      if (app.status === 'approved') studentStats.approved++;
-      if (app.status === 'rejected') studentStats.rejected++;
-    });
+  if (!studentProfile) {
+    return <div className="p-6 text-center text-muted-foreground">Профиль студента не найден.</div>;
   }
 
+  // Загружаем заявки с вложенными данными о вакансии и компании
+  const myApplications: ApplicationWithDetails[] = await db.query.applications.findMany({
+    where: eq(applications.studentId, studentProfile.id),
+    with: {
+      vacancy: {
+        with: { organization: true },
+      },
+    },
+    orderBy: (apps, { desc }) => [desc(apps.createdAt)],
+  });
+
+  const stats = { total: myApplications.length, pending: 0, approved: 0, rejected: 0 };
+  myApplications.forEach(app => {
+    const status = app.status.trim();
+    if (status === 'pending') stats.pending++;
+    if (status === 'approved') stats.approved++;
+    if (status === 'rejected') stats.rejected++;
+  });
+
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h2 className="text-2xl font-bold">Рекомендации для вас</h2>
-          </div>
-          <div className="flex gap-2">
-            <Link href="/profile">
-                {/* studentProfile может быть undefined, используем опциональную цепочку */}
-                <Button variant={studentProfile?.skills.length === 0 ? "destructive" : "secondary"}>
-                    {studentProfile?.skills.length === 0 ? "⚠️ Заполните навыки!" : "👤 Профиль"}
-                </Button>
-            </Link>
-            {/* Ссылка на резюме (если нужно, можно восстановить) */}
-            {/* <Link href="/dashboard/resume">
-                  <Button variant="outline">✎ Резюме</Button>
-            </Link> */}
-          </div>
+    <div className="space-y-6 p-4 max-w-4xl mx-auto">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Мои заявки</h1>
+        <Button variant="outline" asChild>
+          <Link href="/practices" className="flex items-center gap-2">
+            <Search size={16} />
+            <span>Искать вакансии</span>
+          </Link>
+        </Button>
       </div>
 
       {/* СТАТИСТИКА */}
-      <div className="grid grid-cols-3 gap-4 mb-4">
-          <StatsCard icon={<FileText size={16} />} label="Всего заявок" value={studentStats.total} />
-          <StatsCard icon={<CheckCircle size={16} />} label="Приглашений" value={studentStats.approved} color="text-green-600 dark:text-green-400" />
-          <StatsCard icon={<XCircle size={16} />} label="Отказов" value={studentStats.rejected} color="text-destructive" />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatsCard icon={<Clock size={18} />} label="На рассмотрении" value={stats.pending} color="text-yellow-600 dark:text-yellow-400" />
+        <StatsCard icon={<CheckCircle size={18} />} label="Приглашения" value={stats.approved} color="text-green-600 dark:text-green-400" />
+        <StatsCard icon={<XCircle size={18} />} label="Отказы" value={stats.rejected} color="text-red-600 dark:text-red-400" />
       </div>
 
-      {/* ФИЛЬТРЫ */}
-      <div className="flex gap-2 border-b pb-4 overflow-x-auto">
-          <FilterButton active={filterType === 'all'} href="/dashboard?filter=all">Все</FilterButton>
-          <FilterButton active={filterType === 'practice'} href="/dashboard?filter=practice">🎓 Практика</FilterButton>
-          <FilterButton active={filterType === 'job'} href="/dashboard?filter=job">💼 Работа</FilterButton>
-      </div>
-      
-      {/* СПИСОК ВАКАНСИЙ */}
-      {visibleVacancies.length === 0 ? (
-        <div className="p-10 text-center bg-muted rounded border border-dashed">
-          <p className="text-muted-foreground">Нет подходящих вакансий. Проверьте профиль или фильтры.</p>
+      {/* СПИСОК ЗАЯВОК */}
+      {myApplications.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-12 bg-muted/30 rounded-lg border border-dashed">
+          <FileText className="h-12 w-12 text-muted-foreground mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Заявок пока нет</h3>
+          <p className="text-muted-foreground text-center max-w-md mb-4">
+            Вы еще не откликались на вакансии. Перейдите в каталог, чтобы найти подходящие варианты.
+          </p>
+          <Button asChild>
+            <Link href="/practices">Перейти к вакансиям</Link>
+          </Button>
         </div>
       ) : (
-        <div className="grid gap-6">
-          {visibleVacancies.map((vac) => {
-            const application = myApplicationsMap.get(vac.id);
-            const isApplied = !!application;
-            const isHighMatch = vac.matchScore > 0 && vac.missingSkills === 0;
-
-            return (
-              <div key={vac.id} className={`bg-card p-6 rounded-lg shadow-sm border transition hover:shadow-md ${isHighMatch ? "border-l-4 border-l-green-500" : ""}`}>
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-xl font-bold text-foreground">{vac.title}</h3>
-                      <Badge variant="outline" className="text-xs font-normal bg-muted">
-                          {vac.type === 'job' ? 'Работа' : vac.type === 'internship' ? 'Стажировка' : 'Практика'}
-                      </Badge>
-                      {vac.salary && <Badge className="bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 border-green-200 dark:border-green-800">{vac.salary}</Badge>}
-                  </div>
-                  {vac.requiredSkills.length > 0 && (
-                      <div className="text-xs font-medium px-2 py-1 bg-muted rounded border text-muted-foreground ml-2">
-                          Совпадение: <span className={isHighMatch ? "text-green-600 dark:text-green-400 font-bold" : "text-primary"}>{vac.matchScore}/{vac.requiredSkills.length}</span>
-                      </div>
-                  )}
-                </div>
-
-                <p className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
-                  <span>🏢 {vac.organization.name}</span> • <span>Мин. курс: {vac.minCourse}</span>
-                </p>
-                <p className="text-muted-foreground mb-4 line-clamp-3 text-sm">{vac.description}</p>
-
-                <div className="flex flex-col gap-4 mt-4 border-t pt-4">
-                  {isApplied ? (
-                    <div className="bg-muted p-3 rounded-md border text-sm">
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold text-muted-foreground">Статус: {application?.status === 'approved' ? 'Приглашение!' : application?.status === 'rejected' ? 'Отказ' : 'На рассмотрении'}</span>
-                        {application?.status === 'approved' && <a href={`/api/documents/${application.id}`} target="_blank" className="text-primary underline">Скачать направление</a>}
-                      </div>
-                      {application?.responseMessage && <div className="mt-2 text-muted-foreground italic">&quot;{application.responseMessage}&quot;</div>}
-                    </div>
-                  ) : (
-                    <div className="flex justify-between items-center w-full">
-                        <span className="text-xs text-muted-foreground">{vac.createdAt ? new Date(vac.createdAt).toLocaleDateString("ru-RU") : "Недавно"}</span>
-                        <form action={async () => { "use server"; await applyToVacancy(vac.id); }}>
-                          {/* Проверка на null для studentProfile */}
-                          <Button type="submit" disabled={!studentProfile || (studentProfile.skills.length === 0 && vac.requiredSkills.length > 0)}>Откликнуться</Button>
-                        </form>
-                    </div>
-                  )}
-                  {/* Внутри блока isApplied, например, под статусом */}
-                  {application?.status === 'pending' && (
-                    <form
-                      action={async () => {
-                        "use server";
-                        await deleteApplication(application.id);
-                      }}
-                      className="mt-2"
-                    >
-                      <Button variant="link" size="sm" className="text-destructive h-auto p-0 text-xs">
-                        Отозвать заявку
-                      </Button>
-                    </form>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+        <div className="grid gap-4">
+          {myApplications.map((app) => (
+            <ApplicationCard key={app.id} application={app} />
+          ))}
         </div>
       )}
     </div>
   );
 }
 
-// --- ВСПОМОГАТЕЛЬНЫЕ КОМПОНЕНТЫ (Строго типизированные) ---
-
+// --- ВСПОМОГАТЕЛЬНЫЕ КОМПОНЕНТЫ ---
 interface StatsCardProps {
   icon: ReactNode;
   label: string;
@@ -232,25 +115,87 @@ interface StatsCardProps {
 
 function StatsCard({ icon, label, value, color = "text-foreground" }: StatsCardProps) {
   return (
-    <Card>
-      <CardContent className="p-4 flex flex-col items-center justify-center text-center">
-          <div className={`text-2xl font-bold ${color}`}>{value}</div>
-          <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">{icon} {label}</div>
-      </CardContent>
-    </Card>
-  )
+    <div className="bg-card border rounded-lg p-4 flex items-center gap-4">
+      <div className={`p-2 rounded-full bg-muted ${color}`}>{icon}</div>
+      <div>
+        <div className={`text-2xl font-bold ${color}`}>{value}</div>
+        <div className="text-sm text-muted-foreground">{label}</div>
+      </div>
+    </div>
+  );
 }
 
-interface FilterButtonProps {
-  active: boolean;
-  href: string;
-  children: ReactNode;
-}
+function ApplicationCard({ application }: { application: ApplicationWithDetails }) {
+  const { vacancy, status, responseMessage, createdAt } = application;
+  const rawStatus = status.trim();
 
-function FilterButton({ active, href, children }: FilterButtonProps) {
+  const statusConfig = {
+    pending: { label: "На рассмотрении", color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border-yellow-200" },
+    approved: { label: "Приглашение!", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border-green-200" },
+    rejected: { label: "Отказ", color: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-red-200" },
+  };
+  const currentStatus = statusConfig[rawStatus as keyof typeof statusConfig] || statusConfig.pending;
+
+  // Иконка типа вакансии
+  const typeIcon = vacancy.type === 'job' ? <Briefcase size={14} /> : vacancy.type === 'internship' ? <GraduationCap size={14} /> : <BookOpen size={14} />;
+  const typeLabel = vacancy.type === 'job' ? 'Работа' : vacancy.type === 'internship' ? 'Стажировка' : 'Практика';
+
   return (
-    <Link href={href} scroll={false}>
-      <Button variant={active ? 'default' : 'outline'} size="sm" className="rounded-full">{children}</Button>
-    </Link>
-  )
+    <div className="bg-card border rounded-lg p-5 hover:shadow-md transition-shadow">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-3">
+        <div>
+          <h3 className="text-lg font-semibold text-foreground">{vacancy.title}</h3>
+          <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <Building2 size={14} /> {vacancy.organization.name}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CalendarDays size={14} /> {createdAt ? new Date(createdAt).toLocaleDateString("ru-RU") : "Недавно"}
+            </span>
+          </div>
+        </div>
+        <Badge className={`${currentStatus.color} border`}>{currentStatus.label}</Badge>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-4 mb-3 text-sm text-muted-foreground">
+        <span className="flex items-center gap-1.5 bg-secondary px-2 py-0.5 rounded text-xs font-medium">
+          {typeIcon} {typeLabel}
+        </span>
+        {vacancy.salary && (
+          <span className="flex items-center gap-1.5">
+            <Coins size={14} /> {vacancy.salary}
+          </span>
+        )}
+      </div>
+
+      {responseMessage && (
+        <div className="bg-muted/50 border-l-4 border-primary p-3 rounded-r mb-4">
+          <p className="text-sm italic text-muted-foreground">&quot;{responseMessage}&quot;</p>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between pt-3 border-t mt-2">
+        {rawStatus === 'approved' ? (
+          <a 
+            href={`/api/documents/${application.id}`} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-sm font-medium text-primary hover:underline flex items-center gap-1.5"
+          >
+            <Download size={14} /> Скачать направление
+          </a>
+        ) : (
+          <span className="text-xs text-muted-foreground">Сопроводительное письмо отправлено</span>
+        )}
+
+        {rawStatus === 'pending' && (
+          <form action={async () => { "use server"; await deleteApplication(application.id); }}>
+            <Button variant="outline" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10 flex items-center gap-1.5">
+              <Undo2 size={14} /> Отозвать заявку
+            </Button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
 }

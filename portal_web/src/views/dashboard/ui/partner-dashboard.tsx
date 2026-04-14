@@ -5,101 +5,107 @@ import { eq, desc } from "drizzle-orm";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Clock, CheckCircle, Trash2 } from "lucide-react";
+import { Users, Clock, CheckCircle, Trash2, Plus, Settings } from "lucide-react";
 import { deleteVacancy } from "@/app/actions/vacancy";
 
 export async function PartnerDashboard({ userId }: { userId: number }) {
-  // 1. Получаем организацию
   const rep = await db.query.organizationRepresentatives.findFirst({
     where: eq(organizationRepresentatives.userId, userId),
     with: { organization: true },
   });
-  
-  if (!rep) return <div className="p-4 bg-yellow-100 dark:bg-yellow-900/20 rounded text-yellow-800 dark:text-yellow-400">Организация не найдена. <Link href="/dashboard/register-org" className="underline">Зарегистрировать</Link></div>;
 
-  const myOrg = rep.organization;
+  if (!rep) {
+    return (
+      <div className="p-6 text-center">
+        <h2 className="text-xl font-bold mb-2">Организация не найдена</h2>
+        <Button asChild><Link href="/register?role=organization">Зарегистрировать</Link></Button>
+      </div>
+    );
+  }
 
-  // 2. Получаем вакансии + статистику
   const myVacancies = await db.query.vacancies.findMany({
-    where: eq(vacancies.organizationId, myOrg.id),
-    with: {
-      applications: { columns: { status: true } }
-    },
+    where: eq(vacancies.organizationId, rep.organization.id),
+    with: { applications: { columns: { status: true } } },
     orderBy: [desc(vacancies.createdAt)],
   });
 
   return (
-    <div className="space-y-6">
-      <div className="bg-card p-6 rounded-lg shadow border">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-foreground">Вакансии компании &quot;{myOrg.name}&quot;</h2>
-          <div className="flex gap-2">
-              <Link href="/dashboard/organization"><Button variant="outline" size="icon" title="Настройки">⚙️</Button></Link>
-              <Link href="/dashboard/applications"><Button variant="secondary">Посмотреть заявки</Button></Link>
-              <Link href="/dashboard/create-vacancy"><Button>+ Добавить вакансию</Button></Link>
-          </div>
+    <div className="space-y-6 p-4">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Вакансии: {rep.organization.name}</h1>
+        <div className="flex gap-2">
+          <Button variant="outline" asChild>
+            <Link href="/dashboard/applications?status=all" className="flex items-center gap-2">
+              <Users size={16} /> Все заявки
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href="/dashboard/vacancies/new" className="flex items-center gap-2">
+              <Plus size={16} /> Добавить
+            </Link>
+          </Button>
         </div>
+      </div>
 
-        {myVacancies.length === 0 ? (
-          <div className="text-center py-10 text-muted-foreground border border-dashed rounded-lg">
-            <p>У вас пока нет активных вакансий.</p>
-            <p className="text-sm">Создайте первую вакансию, чтобы начать поиск студентов.</p>
-          </div>
-        ) : (
-          <div className="grid gap-4">
-            {myVacancies.map((vac) => {
-              const totalApps = vac.applications.length;
-              const newApps = vac.applications.filter(a => a.status === 'pending').length;
+      {myVacancies.length === 0 ? (
+        <div className="text-center py-12 bg-muted/30 rounded-lg border border-dashed">
+          <p className="text-lg font-medium mb-2">У вас пока нет вакансий</p>
+          <p className="text-sm text-muted-foreground mb-4">Создайте первую вакансию, чтобы начать поиск студентов.</p>
+          <Button asChild><Link href="/dashboard/vacancies/new">Создать вакансию</Link></Button>
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {myVacancies.map((vac) => {
+            const total = vac.applications.length;
+            const pending = vac.applications.filter((a) => a.status === "pending").length;
+            const approved = vac.applications.filter((a) => a.status === "approved").length;
 
-              return (
-                <div key={vac.id} className="p-4 border rounded bg-muted hover:bg-muted/80 transition">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-bold text-lg text-foreground">{vac.title}</h3>
-                        <Badge variant="outline" className="text-xs bg-card">
-                          {vac.type === 'job' ? 'Работа' : vac.type === 'internship' ? 'Стажировка' : 'Практика'}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground line-clamp-1 mb-3">{vac.description}</p>
-
-                      <div className="flex gap-4 text-sm">
-                          <div className="flex items-center gap-1 text-muted-foreground" title="Всего откликов">
-                            <Users size={16} /> <span className="font-medium">{totalApps}</span> кандидатов
-                          </div>
-                          {newApps > 0 && (
-                            <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400 font-bold bg-orange-50 dark:bg-orange-900/20 px-2 py-0.5 rounded-full text-xs">
-                              <Clock size={14} /> <span>{newApps} новых</span>
-                            </div>
-                          )}
-                      </div>
+            return (
+              <div key={vac.id} className="p-5 border rounded-lg bg-card hover:shadow-md transition">
+                <div className="flex flex-col sm:flex-row justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-bold text-lg">{vac.title}</h3>
+                      <Badge variant="outline" className="text-xs bg-muted">
+                        {vac.type === "job" ? "Работа" : vac.type === "internship" ? "Стажировка" : "Практика"}
+                      </Badge>
+                      {!vac.isActive && <Badge variant="destructive" className="text-xs">Скрыта</Badge>}
                     </div>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{vac.description}</p>
 
-                    <div className="text-right flex flex-col gap-2">
-                        <div className="text-sm text-green-600 dark:text-green-400 font-medium flex items-center justify-end gap-1">
-                          <CheckCircle size={14} /> Активна
+                    <div className="flex flex-wrap gap-3 text-sm">
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <Users size={15} /> <span className="font-medium">{total}</span> откликов
+                      </div>
+                      {pending > 0 && (
+                        <div className="flex items-center gap-1.5 text-yellow-600 dark:text-yellow-400 font-medium bg-yellow-50 dark:bg-yellow-900/20 px-2 py-0.5 rounded-full text-xs">
+                          <Clock size={14} /> {pending} новых
                         </div>
-                        <Link href="/dashboard/applications">
-                          <Button variant="ghost" size="sm" className="h-8">К заявкам →</Button>
-                        </Link>
-                        <form
-                          action={async () => {
-                            "use server";
-                            await deleteVacancy(vac.id);
-                          }}
-                        >
-                          <Button variant="ghost" size="sm" className="h-8 w-full text-destructive hover:text-destructive hover:bg-destructive/10 gap-2">
-                            <Trash2 size={14} /> Удалить
-                          </Button>
-                        </form>
+                      )}
+                      {approved > 0 && (
+                        <div className="flex items-center gap-1.5 text-green-600 dark:text-green-400 font-medium bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full text-xs">
+                          <CheckCircle size={14} /> {approved} приглашено
+                        </div>
+                      )}
                     </div>
                   </div>
+
+                  <div className="flex sm:flex-col gap-2 sm:items-end min-w-[140px]">
+                    <Button variant="secondary" size="sm" asChild className="w-full">
+                      <Link href={`/dashboard/applications?vacancy=${vac.id}`}>К заявкам →</Link>
+                    </Button>
+                    <form action={async () => { "use server"; await deleteVacancy(vac.id); }} className="w-full">
+                      <Button variant="ghost" size="sm" className="w-full text-destructive hover:bg-destructive/10 gap-2">
+                        <Trash2 size={14} /> Удалить
+                      </Button>
+                    </form>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
