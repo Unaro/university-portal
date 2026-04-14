@@ -186,7 +186,7 @@ export async function StudentDashboard({ userId, filterType }: StudentDashboardP
                         <span className="font-semibold text-muted-foreground">Статус: {application?.status === 'approved' ? 'Приглашение!' : application?.status === 'rejected' ? 'Отказ' : 'На рассмотрении'}</span>
                         {application?.status === 'approved' && <a href={`/api/documents/${application.id}`} target="_blank" className="text-primary underline">Скачать направление</a>}
                       </div>
-                      {application?.responseMessage && <div className="mt-2 text-muted-foreground italic">"{application.responseMessage}"</div>}
+                      {application?.responseMessage && <div className="mt-2 text-muted-foreground italic">&quot;{application.responseMessage}&quot;</div>}
                     </div>
                   ) : (
                     <div className="flex justify-between items-center w-full">
