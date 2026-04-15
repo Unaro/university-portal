@@ -61,7 +61,6 @@ export default async function ProfilePage() {
   return (
     <ProfileView 
        user={user}
-       // Теперь studentData соответствует типу StudentWithSkills
        studentData={studentData || null}
        resumeData={resumeData}
        majors={allMajors}

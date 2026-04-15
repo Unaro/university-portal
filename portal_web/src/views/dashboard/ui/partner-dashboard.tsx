@@ -40,7 +40,7 @@ export async function PartnerDashboard({ userId }: { userId: number }) {
             </Link>
           </Button>
           <Button asChild>
-            <Link href="/dashboard/vacancies/new" className="flex items-center gap-2">
+            <Link href="/dashboard/create-vacancy" className="flex items-center gap-2">
               <Plus size={16} /> Добавить
             </Link>
           </Button>
@@ -51,7 +51,7 @@ export async function PartnerDashboard({ userId }: { userId: number }) {
         <div className="text-center py-12 bg-muted/30 rounded-lg border border-dashed">
           <p className="text-lg font-medium mb-2">У вас пока нет вакансий</p>
           <p className="text-sm text-muted-foreground mb-4">Создайте первую вакансию, чтобы начать поиск студентов.</p>
-          <Button asChild><Link href="/dashboard/vacancies/new">Создать вакансию</Link></Button>
+          <Button asChild><Link href="/dashboard/create-vacancy">Создать вакансию</Link></Button>
         </div>
       ) : (
         <div className="grid gap-4">

@@ -47,7 +47,7 @@ export function ProfileView({ user, studentData, resumeData, majors, skills, app
           <div className="md:col-span-3">
              <StudentProfileWidget 
                 profileData={safeProfileData}
-                resumeData={resumeData} // <--- Передаем дальше
+                resumeData={resumeData}
                 majors={majors}
                 skills={skills}
                 applications={applications}
