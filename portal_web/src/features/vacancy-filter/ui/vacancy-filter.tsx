@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 import { useTransition } from "react";
 import { Input } from "@/shared/ui/input";
-import { Button } from "@/shared/ui/button";
+import { Button, RadioGroup, RadioGroupItem } from "@/shared/ui";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { Label } from "@/shared/ui/label";
 import { Card } from "@/shared/ui/card";
@@ -150,17 +150,28 @@ export function VacancyFilter({ isStudent }: VacancyFilterProps) {
 
           {/* Курс */}
           <div>
-             <h4 className="text-sm font-medium mb-3">Для курса</h4>
-             <div className="space-y-2">
+             <h4 className="text-sm font-medium mb-3">Я студент</h4>
+             <RadioGroup 
+                value={searchParams.get("course") || ""} 
+                onValueChange={(val: string) => {
+                  const params = new URLSearchParams(searchParams);
+                  if (val) params.set("course", val);
+                  else params.delete("course");
+                  params.delete("page");
+                  startTransition(() => {
+                    replace(`?${params.toString()}`, { scroll: false });
+                  });
+                }}
+             >
                 {[1, 2, 3, 4, 5, 6].map(course => (
-                    <FilterCheckbox 
-                        key={course} 
-                        label={`${course} курс`} 
-                        checked={isChecked("course", course.toString())} 
-                        onCheckedChange={(c) => handleFilter("course", course.toString(), c as boolean)} 
-                    />
+                    <div key={course} className="flex items-center space-x-2">
+                        <RadioGroupItem value={course.toString()} id={`course-${course}`} />
+                        <Label htmlFor={`course-${course}`} className="text-sm leading-none cursor-pointer font-normal">
+                            {course} курса
+                        </Label>
+                    </div>
                 ))}
-             </div>
+             </RadioGroup>
           </div>
         </div>
       </Card>

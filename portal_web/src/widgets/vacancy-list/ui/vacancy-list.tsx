@@ -84,11 +84,11 @@ export async function VacancyList({ searchParams }: VacancyListProps) {
     sqlFilters.push(isNotNull(vacancies.salary));
   }
 
-  // Курс (Точное соответствие)
+  // Курс (Меньше или равно выбранному - студент может видеть всё для младших курсов)
   if (course) {
-    const courses = course.split(",").map(Number);
-    if (courses.length > 0) {
-       sqlFilters.push(inArray(vacancies.minCourse, courses));
+    const selectedCourse = Number(course);
+    if (!isNaN(selectedCourse)) {
+       sqlFilters.push(sql`${vacancies.minCourse} <= ${selectedCourse}`);
     }
   }
 

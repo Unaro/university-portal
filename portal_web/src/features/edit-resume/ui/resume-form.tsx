@@ -3,7 +3,7 @@
 
 import { useActionState, useEffect } from "react";
 import { saveResume, ResumeActionState } from "@/app/actions/resume";
-import { Button } from "@/shared/ui/button";
+import { Button, BackButton } from "@/shared/ui";
 import { Textarea } from "@/shared/ui/textarea";
 import { Label } from "@/shared/ui/label";
 import { Input } from "@/shared/ui/input";
@@ -73,9 +73,7 @@ export function ResumeForm({
             <Button type="submit" disabled={isPending}>
               {isPending ? "Сохранение..." : "Сохранить резюме"}
             </Button>
-            <Link href="/dashboard">
-              <Button variant="outline" type="button">Назад</Button>
-            </Link>
+            <BackButton variant="outline" label="Назад" type="button" />
           </div>
           
         </form>

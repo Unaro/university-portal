@@ -9,7 +9,7 @@ import { verifyOrganization } from "@/app/actions/admin";
 import { getFileUrl } from "@/lib/s3";
 import { getAdminStats } from "@/app/actions/stats";
 import Image from "next/image";
-import { StatsCard } from "@/shared/ui";
+import { StatsCard, BackButton } from "@/shared/ui";
 import { UniversityApplicationManager } from "@/widgets/application-manager/ui/university-application-manager";
 
 export async function AdminView() {
@@ -37,9 +37,7 @@ export async function AdminView() {
     <div className="p-10 max-w-6xl mx-auto min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Панель модератора</h1>
-        <Link href="/dashboard">
-          <Button variant="outline">← Назад</Button>
-        </Link>
+        <BackButton variant="outline" label="Назад" />
       </div>
 
       {stats && (

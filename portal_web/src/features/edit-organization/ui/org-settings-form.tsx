@@ -3,7 +3,7 @@
 
 import { useActionState, useEffect } from "react";
 import { updateOrganization, OrgSettingsState } from "@/app/actions/organization-settings";
-import { Button } from "@/shared/ui/button";
+import { Button, BackButton } from "@/shared/ui";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Textarea } from "@/shared/ui/textarea";
@@ -60,7 +60,7 @@ export function OrgSettingsForm({ initialData }: { initialData: Organization }) 
             <Button type="submit" disabled={isPending}>
               {isPending ? "Сохранение..." : "Сохранить изменения"}
             </Button>
-            <Link href="/dashboard"><Button variant="outline" type="button">Назад</Button></Link>
+            <BackButton variant="outline" label="Назад" type="button" />
           </div>
         </form>
       </CardContent>
