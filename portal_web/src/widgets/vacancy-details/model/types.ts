@@ -6,6 +6,8 @@ export interface VacancyDetailsProps {
     requirements?: string | null;
     salary?: string | null;
     type: string;
+    availableSpots?: number | null;
+    approvedCount: number;
     createdAt: Date | null;
     organization: {
       name: string;

@@ -80,6 +80,7 @@ export default async function PracticeDetailsPage({ params }: PageProps) {
       logoUrl,
     },
     skills: vacancy.requiredSkills.map(rs => rs.skill),
+    approvedCount: vacancy.applications.length,
   };
 
   return (

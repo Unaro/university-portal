@@ -37,8 +37,13 @@ export function VacancyHeader({ data, isApplied, canApply, isLoggined, isFull }:
             <Badge variant="secondary" className="bg-card border text-sm py-1">
                 {data.type === 'job' ? 'Работа' : data.type === 'internship' ? 'Стажировка' : 'Практика'}
             </Badge>
+            {data.availableSpots && (
+              <Badge variant="secondary" className="bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 border-blue-100 dark:border-blue-800 text-sm py-1">
+                Свободно мест: {data.availableSpots - data.approvedCount} из {data.availableSpots}
+              </Badge>
+            )}
             {data.skills.map((skill, i) => (
-              <Badge key={i} variant="outline" className="bg-transparent">
+              <Badge key={i} variant="outline" className="bg-transparent text-sm py-1">
                 {skill.name}
               </Badge>
             ))}

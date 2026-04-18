@@ -2,7 +2,7 @@
 export const dynamic = "force-dynamic";
 
 import { db } from "@/db";
-import { vacancies, organizations, users } from "@/db/schema";
+import { vacancies, organizations, users, applications } from "@/db/schema";
 import { eq, and, desc, count } from "drizzle-orm";
 import { HomeView } from "@/views/home/ui/home-view";
 
@@ -17,30 +17,25 @@ export default async function HomePage() {
     })
   ]);
 
-  // 2. Свежие вакансии
-  const activeVacancies = await db
-    .select({
-      // Выбираем поля, соответствующие схеме VacancyCardProps
-      // Drizzle вернет объект, который мы потом смерджим
-      vacancy: vacancies,
-      organization: organizations
-    })
-    .from(vacancies)
-    .innerJoin(organizations, eq(vacancies.organizationId, organizations.id))
-    .where(
-      and(
-        eq(vacancies.isActive, true),
-        eq(organizations.verificationStatus, "approved")
-      )
-    )
-    .orderBy(desc(vacancies.createdAt))
-    .limit(6);
+  // 2. Свежие вакансии (только активные, от подтвержденных компаний и где есть места)
+  const rawVacancies = await db.query.vacancies.findMany({
+    where: eq(vacancies.isActive, true),
+    with: {
+      organization: true,
+      applications: {
+        where: eq(applications.status, "approved"),
+        columns: { id: true }
+      }
+    },
+    orderBy: [desc(vacancies.createdAt)],
+    limit: 10,
+  });
 
-  // Приводим к плоскому виду для карточки
-  const formattedVacancies = activeVacancies.map(v => ({
-    ...v.vacancy,
-    organization: v.organization
-  }));
+  // Фильтруем подтвержденные организации и наличие мест
+  const formattedVacancies = rawVacancies
+    .filter(v => v.organization.verificationStatus === "approved")
+    .filter(v => !v.availableSpots || v.applications.length < v.availableSpots)
+    .slice(0, 6); // Оставляем топ-6
 
   return <HomeView stats={stats} latestVacancies={formattedVacancies} />;
 }

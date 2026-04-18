@@ -3,6 +3,7 @@ import { ApplicationManagerView } from "@/views/application-manager/ui/applicati
 interface PageProps {
   searchParams?: Promise<{
     status?: string;
+    vacancy?: string;
   }>;
 }
 

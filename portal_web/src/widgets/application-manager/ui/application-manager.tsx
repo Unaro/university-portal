@@ -14,9 +14,10 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/ui/tabs";
 interface ApplicationManagerProps {
   userId: number;
   statusFilter: string;
+  vacancyIdFilter?: number;
 }
 
-export async function ApplicationManager({ userId, statusFilter }: ApplicationManagerProps) {
+export async function ApplicationManager({ userId, statusFilter, vacancyIdFilter }: ApplicationManagerProps) {
   const rep = await db.query.organizationRepresentatives.findFirst({
     where: eq(organizationRepresentatives.userId, userId),
   });
@@ -45,7 +46,8 @@ export async function ApplicationManager({ userId, statusFilter }: ApplicationMa
     );
   }
 
-  const vacancyIds = orgVacancies.map((v) => v.id);
+  // Определяем, какие вакансии мы смотрим: либо одну конкретную, либо все вакансии организации
+  const vacancyIds = vacancyIdFilter ? [vacancyIdFilter] : orgVacancies.map((v) => v.id);
 
   const rawApps = await db.query.applications.findMany({
     where: inArray(applications.vacancyId, vacancyIds),
@@ -85,6 +87,8 @@ export async function ApplicationManager({ userId, statusFilter }: ApplicationMa
       }))
   );
 
+  const vacancyQuery = vacancyIdFilter ? `&vacancy=${vacancyIdFilter}` : "";
+
   return (
     <div className="flex flex-col gap-6">
       {/* Статистика */}
@@ -99,22 +103,22 @@ export async function ApplicationManager({ userId, statusFilter }: ApplicationMa
       <Tabs defaultValue={statusFilter} className="w-full">
         <TabsList className="grid w-full grid-cols-4 lg:w-fit lg:grid-cols-4">
           <TabsTrigger value="all" asChild>
-            <Link href="/dashboard/applications?status=all" scroll={false} prefetch>
+            <Link href={`/dashboard/applications?status=all${vacancyQuery}`} scroll={false} prefetch>
               Все
             </Link>
           </TabsTrigger>
           <TabsTrigger value="pending" asChild>
-            <Link href="/dashboard/applications?status=pending" scroll={false} prefetch>
+            <Link href={`/dashboard/applications?status=pending${vacancyQuery}`} scroll={false} prefetch>
               На рассмотрении
             </Link>
           </TabsTrigger>
           <TabsTrigger value="approved" asChild>
-            <Link href="/dashboard/applications?status=approved" scroll={false} prefetch>
+            <Link href={`/dashboard/applications?status=approved${vacancyQuery}`} scroll={false} prefetch>
               Приглашены
             </Link>
           </TabsTrigger>
           <TabsTrigger value="rejected" asChild>
-            <Link href="/dashboard/applications?status=rejected" scroll={false} prefetch>
+            <Link href={`/dashboard/applications?status=rejected${vacancyQuery}`} scroll={false} prefetch>
               Отказы
             </Link>
           </TabsTrigger>
