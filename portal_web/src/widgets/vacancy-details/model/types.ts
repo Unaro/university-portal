@@ -19,4 +19,5 @@ export interface VacancyDetailsProps {
   isApplied: boolean;
   canApply: boolean;
   isLoggined: boolean;
+  isFull: boolean;
 }

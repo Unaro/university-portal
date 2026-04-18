@@ -81,19 +81,27 @@ export function CreateVacancyForm({ allMajors, allSkills }: CreateVacancyFormPro
 
           {/* Фильтры студентов */}
           <div className="p-4 bg-muted rounded-lg border space-y-4">
-            <h3 className="font-semibold text-sm text-muted-foreground">Требования к кандидату</h3>
+            <h3 className="font-semibold text-sm text-muted-foreground">Требования и квоты</h3>
             
-            <div className="space-y-2">
-               <Label>Минимальный курс</Label>
-               <input type="hidden" name="minCourse" value={minCourse} />
-               <Select value={minCourse} onValueChange={setMinCourse}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                     {[1, 2, 3, 4, 5, 6].map(c => (
-                        <SelectItem key={c} value={c.toString()}>{c} курс и старше</SelectItem>
-                     ))}
-                  </SelectContent>
-               </Select>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Минимальный курс</Label>
+                <input type="hidden" name="minCourse" value={minCourse} />
+                <Select value={minCourse} onValueChange={setMinCourse}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {[1, 2, 3, 4, 5, 6].map(c => (
+                          <SelectItem key={c} value={c.toString()}>{c} курс и старше</SelectItem>
+                      ))}
+                    </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="availableSpots">Количество мест (опционально)</Label>
+                <Input id="availableSpots" name="availableSpots" type="number" min="1" placeholder="Например, 4" />
+                {state.errors?.availableSpots && <p className="text-destructive text-sm">{state.errors.availableSpots}</p>}
+              </div>
             </div>
 
             <div className="space-y-2">

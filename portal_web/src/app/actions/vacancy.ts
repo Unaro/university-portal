@@ -22,6 +22,7 @@ const createVacancySchema = z.object({
   // Новые поля
   salary: z.string().optional(),
   minCourse: z.coerce.number().min(1).max(6),
+  availableSpots: z.preprocess((val) => (val === "" ? null : val), z.coerce.number().min(1, "Должно быть минимум 1 место").optional().nullable()),
   type: z.enum(["practice", "internship", "job"]),
   // Массивы ID для связей
   skillIds: z.array(z.number()),
@@ -181,10 +182,5 @@ export async function toggleVacancyStatus(vacancyId: number) {
   } catch (error) {
     console.error("Toggle vacancy status error:", error);
     return { success: false, message: "Ошибка при обновлении статуса" };
-  }
-};
-  } catch (error) {
-    console.error("Delete vacancy error:", error);
-    return { success: false, message: "Ошибка при удалении" };
   }
 }

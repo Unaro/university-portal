@@ -9,11 +9,15 @@ import { vacancies, organizations, skills } from "@/db/schema";
 // Уточняем тип: теперь мы ждем массив requiredSkills с вложенным skill
 export type VacancyCardProps = typeof vacancies.$inferSelect & {
   organization: typeof organizations.$inferSelect;
-  requiredSkills?: { skill: typeof skills.$inferSelect }[]; // <--- НОВОЕ
+  requiredSkills?: { skill: typeof skills.$inferSelect }[]; 
+  applications?: { id: number }[]; // <--- НОВОЕ
   matchScore?: number;
 };
 
 export function VacancyCard({ data }: { data: VacancyCardProps }) {
+  const approvedCount = data.applications?.length || 0;
+  const totalSpots = data.availableSpots;
+
   return (
     <Card className="hover:shadow-md transition-shadow border-muted group h-full">
       <CardContent className="p-6">
@@ -32,6 +36,11 @@ export function VacancyCard({ data }: { data: VacancyCardProps }) {
                   {data.salary && (
                     <span className="text-green-600 dark:text-green-400 font-semibold bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded text-xs border border-green-100 dark:border-green-800 ml-2">
                       {data.salary}
+                    </span>
+                  )}
+                  {totalSpots && (
+                    <span className="text-blue-600 dark:text-blue-400 font-semibold bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded text-xs border border-blue-100 dark:border-blue-800 ml-2">
+                      Мест: {totalSpots - approvedCount} / {totalSpots}
                     </span>
                   )}
                 </div>

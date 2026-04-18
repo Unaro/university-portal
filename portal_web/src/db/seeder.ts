@@ -301,6 +301,7 @@ async function seedDatabase() {
       type: v.type,
       salary: v.salary,
       minCourse: v.minCourse,
+      availableSpots: v.availableSpots || null,
     })))
     .onConflictDoNothing()
     .returning();

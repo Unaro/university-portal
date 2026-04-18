@@ -34,11 +34,22 @@ export async function applyToVacancy(vacancyId: number): Promise<ActionResponse>
   // Проверка существования вакансии
   const vacancy = await db.query.vacancies.findFirst({
     where: eq(vacancies.id, vacancyId),
-    with: { organization: true },
+    with: { 
+      organization: true,
+      applications: {
+        where: eq(applications.status, "approved"),
+        columns: { id: true }
+      }
+    },
   });
 
   if (!vacancy || !vacancy.isActive || vacancy.organization.verificationStatus !== "approved") {
     return { success: false, message: "Вакансия не найдена, неактивна или организация не подтверждена.", code: "NOT_FOUND" };
+  }
+
+  // Проверка лимита мест
+  if (vacancy.availableSpots && vacancy.applications.length >= vacancy.availableSpots) {
+    return { success: false, message: "Набор на данную вакансию уже закрыт (места закончились).", code: "FORBIDDEN" };
   }
 
   // Проверка дубликатов (уже откликался?)

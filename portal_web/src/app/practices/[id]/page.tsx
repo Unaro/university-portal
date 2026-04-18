@@ -25,11 +25,17 @@ export default async function PracticeDetailsPage({ params }: PageProps) {
       organization: true,
       requiredSkills: {
         with: { skill: true }
+      },
+      applications: {
+        where: eq(applications.status, "approved"),
+        columns: { id: true }
       }
     }
   });
 
-  if (!vacancy || vacancy.organization.verificationStatus !== "approved") notFound();
+  if (!vacancy || vacancy.organization.verificationStatus !== "approved" || (!vacancy.isActive && session?.user?.role !== "admin")) notFound();
+
+  const isFull = vacancy.availableSpots ? vacancy.applications.length >= vacancy.availableSpots : false;
 
   // 2. Проверяем статус отклика и возможность откликнуться, а так же залогинен ли сам пользователь
   let isApplied = false;
@@ -56,8 +62,8 @@ export default async function PracticeDetailsPage({ params }: PageProps) {
       
       isApplied = !!application;
       isLoggined = true
-      // Проверка на возможность отклика (заполнены навыки)
-      canApply = studentProfile.skills.length > 0;
+      // Проверка на возможность отклика (заполнены навыки + есть места + вакансия активна)
+      canApply = studentProfile.skills.length > 0 && !isFull && (vacancy.isActive ?? false);
     }
   }
 
@@ -82,6 +88,7 @@ export default async function PracticeDetailsPage({ params }: PageProps) {
       isApplied={isApplied}
       canApply={canApply}
       isLoggined={isLoggined}
+      isFull={isFull}
     />
   );
 }

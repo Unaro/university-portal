@@ -1,6 +1,6 @@
 // src/widgets/vacancy-list/ui/vacancy-list.tsx
 import { db } from "@/db";
-import { vacancies } from "@/db/schema";
+import { vacancies, applications } from "@/db/schema";
 import { eq, and, desc, gte, inArray, isNotNull } from "drizzle-orm"; // Убрали like
 import { VacancyCard } from "@/entities/vacancy/ui/vacancy-card";
 
@@ -47,7 +47,11 @@ export async function VacancyList({ searchParams }: VacancyListProps) {
     where: and(...filters),
     with: {
       organization: true,
-      requiredSkills: { with: { skill: true } }
+      requiredSkills: { with: { skill: true } },
+      applications: {
+        where: eq(applications.status, "approved"),
+        columns: { id: true }
+      }
     },
     orderBy: [desc(vacancies.createdAt)],
   });
@@ -56,6 +60,9 @@ export async function VacancyList({ searchParams }: VacancyListProps) {
   const data = rawData.filter((vac) => {
     // ❌ Исключаем вакансии от неподтвержденных компаний
     if (vac.organization.verificationStatus !== "approved") return false;
+
+    // ❌ Скрываем вакансии, где набор закрыт (лимит достигнут)
+    if (vac.availableSpots && vac.applications.length >= vac.availableSpots) return false;
 
     if (!search) return true;
     

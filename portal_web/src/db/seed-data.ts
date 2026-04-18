@@ -251,10 +251,11 @@ export const VACANCIES = [
     requirements:
       "Знание Java, Spring, SQL, английский язык не ниже Intermediate.",
     organizationIndex: 3, // Лаборатория Касперского
-    isActive: false,
+    isActive: true,
     type: "job" as const,
     salary: "300 000 - 450 000 ₽",
     minCourse: 4,
+    availableSpots: 5,
   },
   {
     title: "Летняя практика: Информационная безопасность",
@@ -267,6 +268,7 @@ export const VACANCIES = [
     type: "practice" as const,
     salary: undefined, // Неоплачиваемая стажировка
     minCourse: 3,
+    availableSpots: 2,
   },
   {
     title: "Стажер в IT-отдел",

@@ -4,7 +4,7 @@ import { ApplyButton } from "@/features/apply-vacancy";
 import { VacancyDetailsProps } from "../../model/types";
 import Image from "next/image";
 
-export function VacancyHeader({ data, isApplied, canApply, isLoggined }: VacancyDetailsProps) {
+export function VacancyHeader({ data, isApplied, canApply, isLoggined, isFull }: VacancyDetailsProps) {
   return (
     <div className="bg-muted/50 p-6 md:p-8 border-b">
       <div className="flex flex-col md:flex-row justify-between gap-6 items-start">
@@ -57,10 +57,13 @@ export function VacancyHeader({ data, isApplied, canApply, isLoggined }: Vacancy
               <ApplyButton
                 vacancyId={data.id}
                 isApplied={isApplied}
-                disabled={!canApply}
+                disabled={!canApply || isFull}
               />
-              {!canApply && !isApplied && (
+              {!isApplied && !isFull && !canApply && (
                   <p className="text-xs text-destructive text-center">Заполните профиль для отклика</p>
+              )}
+              {!isApplied && isFull && (
+                  <p className="text-xs text-destructive text-center font-medium">Свободных мест больше нет</p>
               )}
             </div>
           )}
