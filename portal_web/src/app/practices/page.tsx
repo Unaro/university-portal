@@ -8,6 +8,8 @@ interface PageProps {
     course?: string;
     page?: string;
     onlyMyMajor?: string;
+    dateFrom?: string;
+    dateTo?: string;
   }>;
 }
 

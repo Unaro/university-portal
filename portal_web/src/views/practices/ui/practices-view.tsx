@@ -11,6 +11,8 @@ interface PracticesViewProps {
     course?: string;
     page?: string;
     onlyMyMajor?: string;
+    dateFrom?: string;
+    dateTo?: string;
   };
   isStudent?: boolean;
 }

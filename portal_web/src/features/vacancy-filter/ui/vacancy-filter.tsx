@@ -21,43 +21,41 @@ export function VacancyFilter({ isStudent }: VacancyFilterProps) {
   const { replace } = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  // 1. Обработка поиска
+  // 1. Обработка поиска (Debounce 300ms)
   const handleSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams);
     if (term) params.set("search", term);
     else params.delete("search");
-    
     params.delete("page");
-    
     startTransition(() => {
         replace(`?${params.toString()}`, { scroll: false });
     });
   }, 300);
 
-  // 2. Обработка чекбоксов
+  // 2. Обработка чекбоксов (Мгновенно, так как клик - редкое действие)
   const handleFilter = (key: string, value: string, checked: boolean) => {
     const params = new URLSearchParams(searchParams);
     const current = params.get(key)?.split(",") || [];
+    let updated = checked ? [...current, value] : current.filter(v => v !== value);
 
-    let updated: string[];
-    if (checked) {
-        updated = [...current, value];
-    } else {
-        updated = current.filter(v => v !== value);
-    }
-
-    if (updated.length > 0) {
-        params.set(key, updated.join(","));
-    } else {
-        params.delete(key);
-    }
-
+    if (updated.length > 0) params.set(key, updated.join(","));
+    else params.delete(key);
     params.delete("page");
-    
     startTransition(() => {
         replace(`?${params.toString()}`, { scroll: false });
     });
   };
+
+  // 3. Обработка дат (Debounce 500ms, чтобы не спамить при вводе с клавиатуры)
+  const handleDateChangeDebounced = useDebouncedCallback((key: string, value: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (value) params.set(key, value);
+    else params.delete(key);
+    params.delete("page");
+    startTransition(() => {
+        replace(`?${params.toString()}`, { scroll: false });
+    });
+  }, 500);
 
   const resetFilters = () => {
     startTransition(() => {
@@ -65,13 +63,10 @@ export function VacancyFilter({ isStudent }: VacancyFilterProps) {
     });
   };
 
-  const isChecked = (key: string, value: string) => {
-      const val = searchParams.get(key);
-      return val?.split(",").includes(value) || false;
-  };
+  const isChecked = (key: string, value: string) => searchParams.get(key)?.split(",").includes(value) || false;
 
   return (
-    <div className={`space-y-6 transition-opacity duration-200 ${isPending ? "opacity-70 pointer-events-none" : ""}`}>
+    <div className={`space-y-6 transition-all duration-300 ${isPending ? "opacity-60 grayscale-[0.5]" : ""}`}>
       {/* ПОИСК */}
       <div className="relative">
         {isPending ? (
@@ -81,16 +76,13 @@ export function VacancyFilter({ isStudent }: VacancyFilterProps) {
         )}
         <Input
           placeholder="Поиск по названию..."
-          className="pl-10 bg-card transition-all focus:ring-primary/20"
+          className="pl-10 bg-card"
           defaultValue={searchParams.get("search")?.toString()}
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
 
-      {/* САЙДБАР С ФИЛЬТРАМИ */}
-      <Card className="p-4 border-muted bg-muted/50 hidden lg:block relative overflow-hidden">
-        {isPending && <div className="absolute inset-0 bg-background/10 backdrop-blur-[1px] z-10" />}
-        
+      <Card className="p-4 border-muted bg-muted/50 hidden lg:block relative">
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-semibold flex items-center gap-2"><Filter className="h-4 w-4" /> Фильтры</h3>
           <Button variant="ghost" size="sm" className="h-auto px-2 text-xs text-muted-foreground hover:text-destructive" onClick={resetFilters}>Сбросить</Button>
@@ -100,23 +92,17 @@ export function VacancyFilter({ isStudent }: VacancyFilterProps) {
           {isStudent && (
             <>
               <div>
-                <h4 className="text-sm font-medium mb-3">Персонализация</h4>
+                <h4 className="text-sm font-medium mb-3 text-primary">Персонализация</h4>
                 <div className="space-y-2">
                   <FilterCheckbox 
                     label="Только для моей специальности" 
-                    // По умолчанию true, если нет 'false'
                     checked={searchParams.get("onlyMyMajor") !== "false"} 
                     onCheckedChange={(c) => {
                       const params = new URLSearchParams(searchParams);
-                      // Если снимаем галочку -> ставим 'false'
                       if (!c) params.set("onlyMyMajor", "false");
-                      // Если ставим -> удаляем 'false' (возвращаем дефолт) или ставим 'true'
                       else params.delete("onlyMyMajor");
-                      
                       params.delete("page");
-                      startTransition(() => {
-                        replace(`?${params.toString()}`, { scroll: false });
-                      });
+                      startTransition(() => replace(`?${params.toString()}`, { scroll: false }));
                     }} 
                   />
                 </div>
@@ -125,7 +111,6 @@ export function VacancyFilter({ isStudent }: VacancyFilterProps) {
             </>
           )}
 
-          {/* Тип занятости */}
           <div>
             <h4 className="text-sm font-medium mb-3">Тип практики</h4>
             <div className="space-y-2">
@@ -137,41 +122,53 @@ export function VacancyFilter({ isStudent }: VacancyFilterProps) {
           
           <Separator />
           
-          {/* Условия */}
           <div>
-             <h4 className="text-sm font-medium mb-3">Условия</h4>
-             <div className="space-y-2">
-                {/* Фильтр "Оплачиваемая" - проверяем salary IS NOT NULL */}
-                <FilterCheckbox label="Оплачиваемая" checked={isChecked("payment", "paid")} onCheckedChange={(c) => handleFilter("payment", "paid", c as boolean)} />
-             </div>
+            <h4 className="text-sm font-medium mb-3 text-orange-600 dark:text-orange-400">Период прохождения</h4>
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <Label htmlFor="dateFrom" className="text-[10px] uppercase text-muted-foreground font-bold">С даты</Label>
+                <Input id="dateFrom" type="date" className="h-8 text-xs bg-card" 
+                  defaultValue={searchParams.get("dateFrom") || ""}
+                  onChange={(e) => handleDateChangeDebounced("dateFrom", e.target.value)} />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="dateTo" className="text-[10px] uppercase text-muted-foreground font-bold">По дату</Label>
+                <Input id="dateTo" type="date" className="h-8 text-xs bg-card" 
+                  defaultValue={searchParams.get("dateTo") || ""}
+                  onChange={(e) => handleDateChangeDebounced("dateTo", e.target.value)} />
+              </div>
+            </div>
           </div>
 
           <Separator />
 
-          {/* Курс */}
           <div>
              <h4 className="text-sm font-medium mb-3">Я студент</h4>
              <RadioGroup 
                 value={searchParams.get("course") || ""} 
                 onValueChange={(val: string) => {
                   const params = new URLSearchParams(searchParams);
-                  if (val) params.set("course", val);
-                  else params.delete("course");
+                  if (val) params.set("course", val); else params.delete("course");
                   params.delete("page");
-                  startTransition(() => {
-                    replace(`?${params.toString()}`, { scroll: false });
-                  });
+                  startTransition(() => replace(`?${params.toString()}`, { scroll: false }));
                 }}
              >
                 {[1, 2, 3, 4, 5, 6].map(course => (
                     <div key={course} className="flex items-center space-x-2">
                         <RadioGroupItem value={course.toString()} id={`course-${course}`} />
-                        <Label htmlFor={`course-${course}`} className="text-sm leading-none cursor-pointer font-normal">
-                            {course} курса
-                        </Label>
+                        <Label htmlFor={`course-${course}`} className="text-sm leading-none cursor-pointer font-normal">{course} курса</Label>
                     </div>
                 ))}
              </RadioGroup>
+          </div>
+
+          <Separator />
+          
+          <div>
+             <h4 className="text-sm font-medium mb-3">Условия</h4>
+             <div className="space-y-2">
+                <FilterCheckbox label="Оплачиваемая" checked={isChecked("payment", "paid")} onCheckedChange={(c) => handleFilter("payment", "paid", c as boolean)} />
+             </div>
           </div>
         </div>
       </Card>
@@ -183,9 +180,7 @@ function FilterCheckbox({ label, checked, onCheckedChange }: { label: string, ch
   return (
     <div className="flex items-center space-x-2">
       <Checkbox id={label} checked={checked} onCheckedChange={onCheckedChange} />
-      <Label htmlFor={label} className="text-sm leading-none cursor-pointer font-normal">
-        {label}
-      </Label>
+      <Label htmlFor={label} className="text-sm leading-none cursor-pointer font-normal">{label}</Label>
     </div>
   );
 }
