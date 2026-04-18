@@ -37,6 +37,19 @@ export const internshipTypeEnum = pgEnum("internship_type", [
   "job",
 ]);
 
+export const universityApprovalStatusEnum = pgEnum("university_approval_status", [
+  "not_required",
+  "pending",
+  "approved",
+  "rejected",
+]);
+
+export const studentPracticeTypeEnum = pgEnum("student_practice_type", [
+  "educational", // Учебная
+  "production",  // Производственная
+  "pre_diploma", // Преддипломная
+]);
+
 // --- 2. TABLES (Определяем ВСЕ таблицы сначала) ---
 
 // Справочники
@@ -91,6 +104,7 @@ export const vacancies = pgTable("vacancy", {
   type: internshipTypeEnum("type").default("practice").notNull(),
   salary: text("salary"),
   minCourse: integer("min_course").default(1),
+  availableSpots: integer("available_spots"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -119,6 +133,8 @@ export const students = pgTable("student", {
   group: text("group"),
   course: integer("course").default(1),
   majorId: integer("major_id").references(() => majors.id),
+  currentPracticeType: studentPracticeTypeEnum("current_practice_type").default("educational"),
+  projectTheme: text("project_theme"),
 });
 
 export const studentSkills = pgTable("student_skill", {
@@ -163,6 +179,14 @@ export const applications = pgTable("application", {
     .notNull()
     .references(() => vacancies.id, { onDelete: "cascade" }),
   status: applicationStatusEnum("status").default("pending").notNull(),
+  universityApprovalStatus: universityApprovalStatusEnum("university_approval_status")
+    .default("not_required")
+    .notNull(),
+  universityStaffId: integer("university_staff_id")
+    .references(() => universityStaff.id, { onDelete: "set null" }),
+  universityComment: text("university_comment"),
+  practiceType: studentPracticeTypeEnum("practice_type"),
+  projectTheme: text("project_theme"),
   coverLetter: text("cover_letter"),
   responseMessage: text("response_message"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -243,6 +267,7 @@ export const studentSkillsRelations = relations(studentSkills, ({ one }) => ({
 export const applicationsRelations = relations(applications, ({ one }) => ({
   student: one(students, { fields: [applications.studentId], references: [students.id] }),
   vacancy: one(vacancies, { fields: [applications.vacancyId], references: [vacancies.id] }),
+  approvedByStaff: one(universityStaff, { fields: [applications.universityStaffId], references: [universityStaff.id] }),
 }));
 
 export const resumesRelations = relations(resumes, ({ one }) => ({

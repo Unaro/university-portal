@@ -26,13 +26,30 @@ const vacanciesConfig = {
   practice: { label: "Практика", icon: <BookOpen size={14} /> },
 };
 
+const practiceTypeMap = {
+  educational: "Учебная",
+  production: "Производственная",
+  pre_diploma: "Преддипломная",
+};
+
 export function ApplicationCard({ application }: { application: ApplicationWithDetails }) {
-  const { vacancy, status, responseMessage, createdAt } = application;
+  const { vacancy, status, universityApprovalStatus, practiceType, projectTheme, responseMessage, createdAt } = application;
 
   const currentStatus = statusConfig[status] || statusConfig.pending;
 
   const typeIcon = vacanciesConfig[vacancy.type]?.icon || <BookOpen size={14} />;
   const typeLabel = vacanciesConfig[vacancy.type]?.label || 'Неизвестно';
+
+  const isPractice = vacancy.type === 'practice';
+  let displayStatus = currentStatus;
+  
+  if (isPractice && status === 'pending') {
+    if (universityApprovalStatus === 'pending') {
+       displayStatus = { label: "Ожидает одобрения ВУЗа", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 border-blue-200" };
+    } else if (universityApprovalStatus === 'rejected') {
+       displayStatus = { label: "Отклонено ВУЗом", color: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-red-200" };
+    }
+  }
 
   return (
     <div className="bg-card border rounded-lg p-5 hover:shadow-md transition-shadow">
@@ -48,12 +65,13 @@ export function ApplicationCard({ application }: { application: ApplicationWithD
             </span>
           </div>
         </div>
-        <Badge className={`${currentStatus.color} border`}>{currentStatus.label}</Badge>
+        <Badge className={`${displayStatus.color} border`}>{displayStatus.label}</Badge>
       </div>
 
       <div className="flex flex-wrap items-center gap-4 mb-3 text-sm text-muted-foreground">
         <span className="flex items-center gap-1.5 bg-secondary px-2 py-0.5 rounded text-xs font-medium">
           {typeIcon} {typeLabel}
+          {isPractice && practiceType && ` (${practiceTypeMap[practiceType]})`}
         </span>
         {vacancy.salary && (
           <span className="flex items-center gap-1.5">
@@ -61,6 +79,13 @@ export function ApplicationCard({ application }: { application: ApplicationWithD
           </span>
         )}
       </div>
+
+      {isPractice && projectTheme && (
+        <div className="mb-4 text-sm bg-muted/30 p-2 rounded border border-border/50">
+          <span className="text-muted-foreground">Тема проекта: </span>
+          <span className="font-medium text-foreground">{projectTheme}</span>
+        </div>
+      )}
 
       {responseMessage && (
         <div className="bg-muted/50 border-l-4 border-primary p-3 rounded-r mb-4">

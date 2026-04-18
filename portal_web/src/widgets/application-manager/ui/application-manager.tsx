@@ -49,7 +49,7 @@ export async function ApplicationManager({ userId, statusFilter }: ApplicationMa
 
   const rawApps = await db.query.applications.findMany({
     where: inArray(applications.vacancyId, vacancyIds),
-    columns: { id: true, status: true, coverLetter: true, responseMessage: true, createdAt: true },
+    columns: { id: true, status: true, coverLetter: true, responseMessage: true, createdAt: true, universityApprovalStatus: true, practiceType: true, projectTheme: true },
     with: {
       vacancy: { columns: { title: true, type: true } },
       student: {
@@ -65,15 +65,19 @@ export async function ApplicationManager({ userId, statusFilter }: ApplicationMa
     orderBy: [desc(applications.createdAt)],
   });
 
+  const visibleApps = rawApps.filter(
+    (app) => app.vacancy.type !== "practice" || app.universityApprovalStatus === "approved"
+  );
+
   const stats = {
-    total: rawApps.length,
-    pending: rawApps.filter((a) => a.status === "pending").length,
-    approved: rawApps.filter((a) => a.status === "approved").length,
-    rejected: rawApps.filter((a) => a.status === "rejected").length,
+    total: visibleApps.length,
+    pending: visibleApps.filter((a) => a.status === "pending").length,
+    approved: visibleApps.filter((a) => a.status === "approved").length,
+    rejected: visibleApps.filter((a) => a.status === "rejected").length,
   };
 
   const filteredApps = await Promise.all(
-    rawApps
+    visibleApps
       .filter((app) => statusFilter === "all" || app.status === statusFilter)
       .map(async (app) => ({
         ...app,

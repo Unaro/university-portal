@@ -11,8 +11,8 @@ if (!connectionString) {
 }
 
 export default defineConfig({
-  schema: join(__dirname, "src/db/schema.ts"),
-  out: join(__dirname, "drizzle"),
+  schema: "src/db/schema.ts",
+  out: "drizzle",
   dialect: "postgresql",
   dbCredentials: {
     url: connectionString,

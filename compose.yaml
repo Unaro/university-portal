@@ -75,7 +75,7 @@ services:
       db:
         condition: service_healthy
       minio:
-        condition: service_healthy
+        condition: service_started
     env_file:
       - .env
     environment:
@@ -83,6 +83,7 @@ services:
       - S3_ENDPOINT=http://minio:9000
       - CLEAR_DB=${CLEAR_DB:-true}
       - CLEAR_MINIO=${CLEAR_MINIO:-true}
+      - ALLOW_SEED_IN_PROD=1
     entrypoint: ["sh", "-c", "npx drizzle-kit push --force && npx tsx src/db/seeder.ts"]
     networks:
       - app_net

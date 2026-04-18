@@ -243,6 +243,8 @@ async function seedDatabase() {
       group: s.group,
       course: s.course,
       majorId: insertedMajors[s.majorIndex]?.id,
+      currentPracticeType: s.currentPracticeType,
+      projectTheme: s.projectTheme,
     })))
     .onConflictDoNothing()
     .returning();
@@ -324,13 +326,20 @@ async function seedDatabase() {
   
   // 13. Applications
   await db.insert(applications).values(
-    APPLICATIONS.map(a => ({
-      studentId: insertedStudents[a.studentIndex]!.id!,
-      vacancyId: insertedVacancies[a.vacancyIndex]!.id!,
-      status: a.status,
-      coverLetter: a.coverLetter,
-      responseMessage: a.responseMessage,
-    }))
+    APPLICATIONS.map(a => {
+      const vacancy = insertedVacancies[a.vacancyIndex]!;
+      const student = STUDENTS[a.studentIndex]!;
+      return {
+        studentId: insertedStudents[a.studentIndex]!.id!,
+        vacancyId: vacancy.id!,
+        status: a.status,
+        universityApprovalStatus: (vacancy.type === "practice" ? (a.status === "pending" ? "pending" : "approved") : "not_required") as "pending" | "approved" | "not_required" | "rejected",
+        practiceType: vacancy.type === "practice" ? (a.practiceType || student.currentPracticeType) : null,
+        projectTheme: vacancy.type === "practice" ? (a.projectTheme || student.projectTheme) : null,
+        coverLetter: a.coverLetter,
+        responseMessage: a.responseMessage,
+      };
+    })
   ).onConflictDoNothing();
   console.log(`  ✓ ${APPLICATIONS.length} applications`);
   

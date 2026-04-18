@@ -36,12 +36,12 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # ОПЦИОНАЛЬНО: файлы для сидера/миграций (только если планируете запускать их внутри контейнера)
 # Для чистого production эти строки можно закомментировать
-# COPY --from=deps /app/node_modules ./node_modules
-# COPY --from=builder /app/src ./src
-# COPY --from=builder /app/drizzle.config.ts ./
-# COPY drizzle ./drizzle
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/drizzle.config.ts ./
+COPY drizzle ./drizzle
 
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "npx drizzle-kit push --force && node server.js"]

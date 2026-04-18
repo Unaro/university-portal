@@ -24,6 +24,8 @@ interface ProfileFormProps {
     majorId: string;
     course: string;
     skills: string[];
+    currentPracticeType: "educational" | "production" | "pre_diploma" | null;
+    projectTheme: string | null;
   };
   majors: { id: number; name: string }[];
   skills: Option[];
@@ -37,6 +39,7 @@ export function StudentProfileForm({ initialData, majors, skills }: ProfileFormP
   const [selectedSkills, setSelectedSkills] = useState<string[]>(initialData.skills);
   const [selectedMajor, setSelectedMajor] = useState<string>(initialData.majorId);
   const [selectedCourse, setSelectedCourse] = useState<string>(initialData.course);
+  const [selectedPracticeType, setSelectedPracticeType] = useState<string>(initialData.currentPracticeType || "");
 
   // --- МАГИЯ TOAST ---
   useEffect(() => {
@@ -86,6 +89,26 @@ export function StudentProfileForm({ initialData, majors, skills }: ProfileFormP
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Текущий тип практики</Label>
+              <input type="hidden" name="currentPracticeType" value={selectedPracticeType} />
+              <Select value={selectedPracticeType} onValueChange={setSelectedPracticeType}>
+                <SelectTrigger><SelectValue placeholder="Укажите тип практики" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="educational">Учебная практика</SelectItem>
+                  <SelectItem value="production">Производственная практика</SelectItem>
+                  <SelectItem value="pre_diploma">Преддипломная практика</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="projectTheme">Тема проекта (опционально)</Label>
+              <Input id="projectTheme" name="projectTheme" defaultValue={initialData.projectTheme || ""} placeholder="Разработка модуля..." />
+            </div>
           </div>
 
           <div className="space-y-2">

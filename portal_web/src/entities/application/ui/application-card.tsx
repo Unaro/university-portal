@@ -7,6 +7,8 @@ import { Calendar, Mail, FileText, Download } from "lucide-react";
 type ApplicationData = {
   id: number;
   status: "pending" | "approved" | "rejected";
+  practiceType?: "educational" | "production" | "pre_diploma" | null;
+  projectTheme?: string | null;
   coverLetter: string | null;
   responseMessage: string | null;
   createdAt: Date | null;
@@ -26,6 +28,12 @@ interface ApplicationCardProps {
   data: ApplicationData;
   actionSlot?: React.ReactNode;
 }
+
+const practiceTypeMap = {
+  educational: "Учебная практика",
+  production: "Производственная практика",
+  pre_diploma: "Преддипломная практика",
+};
 
 export function ApplicationCard({ data, actionSlot }: ApplicationCardProps) {
   const getInitials = (name: string) => name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
@@ -55,11 +63,23 @@ export function ApplicationCard({ data, actionSlot }: ApplicationCardProps) {
                 </p>
               </div>
               <div className="text-right">
-                <Badge variant="secondary" className="font-normal text-muted-foreground bg-muted">
+                <Badge variant="secondary" className="font-normal text-muted-foreground bg-muted mb-2 inline-block">
                   На вакансию: <span className="font-semibold text-foreground ml-1">{data.vacancy.title}</span>
                 </Badge>
+                {data.vacancy.type === "practice" && data.practiceType && (
+                  <div className="text-xs text-muted-foreground">
+                    Тип: <span className="font-semibold">{practiceTypeMap[data.practiceType]}</span>
+                  </div>
+                )}
               </div>
             </div>
+
+            {data.vacancy.type === "practice" && data.projectTheme && (
+              <div className="mt-3 bg-muted/50 p-3 rounded-md text-sm border border-border/50">
+                <span className="font-semibold block mb-1">Тема проекта:</span>
+                <span className="italic text-muted-foreground">{data.projectTheme}</span>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">

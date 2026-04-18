@@ -10,6 +10,7 @@ import { getFileUrl } from "@/lib/s3";
 import { getAdminStats } from "@/app/actions/stats";
 import Image from "next/image";
 import { StatsCard } from "@/shared/ui";
+import { UniversityApplicationManager } from "@/widgets/application-manager/ui/university-application-manager";
 
 export async function AdminView() {
   const stats = await getAdminStats();
@@ -98,6 +99,8 @@ export async function AdminView() {
           </div>
         )}
       </div>
+
+      <UniversityApplicationManager />
     </div>
   );
 }

@@ -30,6 +30,8 @@ export function ProfileView({ user, studentData, resumeData, majors, skills, app
     majorId: studentData?.majorId?.toString() || "",
     course: studentData?.course?.toString() || "1",
     skills: studentData?.skills.map(s => s.skill.id.toString()) || [],
+    currentPracticeType: studentData?.currentPracticeType || null,
+    projectTheme: studentData?.projectTheme || null,
   };
 
   return (

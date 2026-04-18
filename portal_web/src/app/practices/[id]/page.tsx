@@ -29,7 +29,7 @@ export default async function PracticeDetailsPage({ params }: PageProps) {
     }
   });
 
-  if (!vacancy) notFound();
+  if (!vacancy || vacancy.organization.verificationStatus !== "approved") notFound();
 
   // 2. Проверяем статус отклика и возможность откликнуться, а так же залогинен ли сам пользователь
   let isApplied = false;

@@ -12,6 +12,8 @@ interface StudentProfileWidgetProps {
     majorId: string;
     course: string;
     skills: string[]; // Массив ID навыков (строки для формы)
+    currentPracticeType: "educational" | "production" | "pre_diploma" | null;
+    projectTheme: string | null;
   };
   
   resumeData: Resume | null;

@@ -34,10 +34,11 @@ export async function applyToVacancy(vacancyId: number): Promise<ActionResponse>
   // Проверка существования вакансии
   const vacancy = await db.query.vacancies.findFirst({
     where: eq(vacancies.id, vacancyId),
+    with: { organization: true },
   });
 
-  if (!vacancy || !vacancy.isActive) {
-    return { success: false, message: "Вакансия не найдена или неактивна.", code: "NOT_FOUND" };
+  if (!vacancy || !vacancy.isActive || vacancy.organization.verificationStatus !== "approved") {
+    return { success: false, message: "Вакансия не найдена, неактивна или организация не подтверждена.", code: "NOT_FOUND" };
   }
 
   // Проверка дубликатов (уже откликался?)
@@ -58,6 +59,9 @@ export async function applyToVacancy(vacancyId: number): Promise<ActionResponse>
       studentId: studentProfile.id,
       vacancyId: vacancyId,
       status: "pending",
+      universityApprovalStatus: vacancy.type === "practice" ? "pending" : "not_required",
+      practiceType: vacancy.type === "practice" ? studentProfile.currentPracticeType : null,
+      projectTheme: vacancy.type === "practice" ? studentProfile.projectTheme : null,
     });
 
     revalidatePath("/dashboard");

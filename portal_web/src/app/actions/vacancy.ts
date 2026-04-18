@@ -88,6 +88,7 @@ export async function createVacancy(
         organizationId: representative.organizationId,
         salary: data.salary || null,
         minCourse: data.minCourse,
+        availableSpots: data.availableSpots || null,
         type: data.type,
       }).returning();
 
@@ -146,6 +147,42 @@ export async function deleteVacancy(vacancyId: number) {
 
     revalidatePath("/dashboard");
     return { success: true, message: "Вакансия удалена" };
+  } catch (error) {
+    console.error("Delete vacancy error:", error);
+    return { success: false, message: "Ошибка при удалении" };
+  }
+}
+
+export async function toggleVacancyStatus(vacancyId: number) {
+  const session = await auth();
+  if (!session?.user) return { success: false, message: "Не авторизован" };
+
+  try {
+    const rep = await db.query.organizationRepresentatives.findFirst({
+      where: eq(organizationRepresentatives.userId, parseInt(session.user.id)),
+    });
+
+    if (!rep) return { success: false, message: "Вы не представитель организации" };
+
+    const vacancy = await db.query.vacancies.findFirst({
+      where: eq(vacancies.id, vacancyId),
+    });
+
+    if (!vacancy || vacancy.organizationId !== rep.organizationId) {
+      return { success: false, message: "Вакансия не найдена или нет прав" };
+    }
+
+    await db.update(vacancies)
+      .set({ isActive: !vacancy.isActive })
+      .where(eq(vacancies.id, vacancyId));
+
+    revalidatePath("/dashboard");
+    return { success: true, message: vacancy.isActive ? "Вакансия скрыта" : "Вакансия опубликована" };
+  } catch (error) {
+    console.error("Toggle vacancy status error:", error);
+    return { success: false, message: "Ошибка при обновлении статуса" };
+  }
+};
   } catch (error) {
     console.error("Delete vacancy error:", error);
     return { success: false, message: "Ошибка при удалении" };

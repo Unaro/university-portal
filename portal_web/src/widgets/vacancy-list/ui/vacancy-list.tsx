@@ -16,10 +16,6 @@ interface VacancyListProps {
 }
 
 export async function VacancyList({ searchParams }: VacancyListProps) {
-  // Ждем параметры (в Next.js 15+ это Promise, в 14 - объект, 
-  // но лучше предусмотреть await, если вдруг пропсы станут промисом в будущем, 
-  // хотя здесь они приходят как объект из Page props.
-  // Если у тебя Next 16 и в Page ты делаешь `await searchParams`, то сюда приходит уже объект)
   const { search, type, payment, course } = searchParams;
 
   // 1. Базовые фильтры SQL (Жесткие критерии)
@@ -46,9 +42,6 @@ export async function VacancyList({ searchParams }: VacancyListProps) {
     filters.push(gte(vacancies.minCourse, Math.min(...courses))); 
   }
 
-  // ❌ УДАЛИЛИ SQL ПОИСК:
-  // if (search) { filters.push(like(vacancies.title, `%${search}%`)); }
-
   // 2. Запрос к БД
   const rawData = await db.query.vacancies.findMany({
     where: and(...filters),
@@ -61,6 +54,9 @@ export async function VacancyList({ searchParams }: VacancyListProps) {
 
   // 3. ✅ JS ПОИСК (И по вакансии, И по компании)
   const data = rawData.filter((vac) => {
+    // ❌ Исключаем вакансии от неподтвержденных компаний
+    if (vac.organization.verificationStatus !== "approved") return false;
+
     if (!search) return true;
     
     // Приводим все к нижнему регистру для нечувствительности к регистру

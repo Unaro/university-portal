@@ -60,6 +60,26 @@ export const USERS = [
     email: "nursultanova@sberbank.ru",
     role: "organization_representative" as const,
   },
+  {
+    name: "Волков Сергей",
+    email: "volkov@gazprom.ru",
+    role: "organization_representative" as const,
+  },
+  {
+    name: "Морозова Анна",
+    email: "morozova@kaspersky.com",
+    role: "organization_representative" as const,
+  },
+  {
+    name: "Соколов Иван",
+    email: "sokolov@mts.ru",
+    role: "organization_representative" as const,
+  },
+  {
+    name: "Лебедева Мария",
+    email: "lebedeva@vk.company",
+    role: "organization_representative" as const,
+  },
   // Students
   {
     name: "Ахметов Арман",
@@ -127,7 +147,7 @@ export const ORGANIZATIONS = [
     description:
       "Международная компания, специализирующаяся на разработке решений в области информационной безопасности.",
     website: "https://kaspersky.ru",
-    verificationStatus: "pending" as const,
+    verificationStatus: "approved" as const,
     logo: "/logos/kaspersky.png",
   },
   {
@@ -149,6 +169,16 @@ export const ORGANIZATIONS = [
     website: "https://mts.ru",
     verificationStatus: "approved" as const,
     logo: "/logos/mts.png",
+  },
+  {
+    name: "ООО «ВКонтакте»",
+    iin: "7743001853",
+    contacts: "hr@vk.company",
+    description:
+      "Российская технологическая компания, развивающая экосистему сервисов (VK, Одноклассники, Почта Mail.ru).",
+    website: "https://vk.company",
+    verificationStatus: "pending" as const,
+    logo: null,
   },
 ];
 
@@ -179,7 +209,7 @@ export const VACANCIES = [
     minCourse: 4,
   },
   {
-    title: "Стажер в отдел цифровых решений",
+    title: "Стажер в отдел цифровых решений (Практика)",
     description:
       "Стажировка для студентов технических специальностей. Участие в разработке банковских приложений, работа с микросервисной архитектурой.",
     requirements:
@@ -227,14 +257,14 @@ export const VACANCIES = [
     minCourse: 4,
   },
   {
-    title: "Стажер по информационной безопасности",
+    title: "Летняя практика: Информационная безопасность",
     description:
       "Участие в разработке и тестировании антивирусных решений. Исследование угроз безопасности, анализ вредоносного ПО.",
     requirements:
       "Знание C++, Python, понимание принципов сетевой безопасности, желание развиваться в сфере кибербезопасности.",
     organizationIndex: 3, // Лаборатория Касперского
     isActive: true,
-    type: "internship" as const,
+    type: "practice" as const,
     salary: undefined, // Неоплачиваемая стажировка
     minCourse: 3,
   },
@@ -251,17 +281,41 @@ export const VACANCIES = [
     minCourse: 2,
   },
   {
-    title: "Младший специалист по телекоммуникациям",
+    title: "Производственная практика в телеком-отделе",
     description:
       "Участие в разработке и тестировании телекоммуникационных систем. Работа с сетевыми протоколами и оборудованием.",
     requirements:
       "Знание основ сетевых технологий, Linux, желание учиться. Опыт работы с Docker будет преимуществом.",
     organizationIndex: 5, // МТС
     isActive: true,
-    type: "job" as const,
-    salary: "150 000 - 200 000 ₽",
+    type: "practice" as const,
+    salary: "30 000 ₽",
+    minCourse: 2,
+  },
+  {
+    title: "Преддипломная практика: Аналитика и СУБД",
+    description:
+      "Практика для выпускников. Проектирование архитектуры баз данных для высоконагруженных систем.",
+    requirements:
+      "Отличное знание SQL, понимание принципов работы реляционных СУБД.",
+    organizationIndex: 1, // Яндекс
+    isActive: true,
+    type: "practice" as const,
+    salary: "50 000 ₽",
     minCourse: 4,
   },
+  {
+    title: "Стажер UX/UI дизайнер (Скрытая вакансия)",
+    description:
+      "Стажировка в социальной сети. Вакансия не должна отображаться, так как компания еще не подтверждена.",
+    requirements:
+      "Знание Figma, наличие портфолио.",
+    organizationIndex: 6, // ВКонтакте
+    isActive: true,
+    type: "internship" as const,
+    salary: undefined,
+    minCourse: 2,
+  }
 ];
 
 // ==================== СВЯЗИ ВАКАНСИЙ СО СПЕЦИАЛЬНОСТЯМИ ====================
@@ -293,6 +347,9 @@ export const VACANCY_MAJORS = [
   // МТС телекоммуникации - для ИС и ПИ
   { vacancyIndex: 8, majorIndex: 0 },
   { vacancyIndex: 8, majorIndex: 1 },
+  // Практика СУБД (Яндекс)
+  { vacancyIndex: 9, majorIndex: 0 },
+  { vacancyIndex: 9, majorIndex: 1 },
 ];
 
 // ==================== СВЯЗИ ВАКАНСИЙ С НАВЫКАМИ ====================
@@ -330,39 +387,52 @@ export const VACANCY_SKILLS = [
   // МТС телекоммуникации
   { vacancyIndex: 8, skillIndex: 10 }, // Docker
   { vacancyIndex: 8, skillIndex: 11 }, // Git
+  // Практика СУБД (Яндекс)
+  { vacancyIndex: 9, skillIndex: 8 }, // SQL
+  { vacancyIndex: 9, skillIndex: 9 }, // PostgreSQL
 ];
 
 // ==================== СТУДЕНТЫ ====================
 export const STUDENTS = [
   {
-    userIndex: 5, // Ахметов Арман
+    userIndex: 9, // Ахметов Арман
     group: "ИС-20-1",
     course: 3,
     majorIndex: 0, // Информационные системы
+    currentPracticeType: "production" as const,
+    projectTheme: "Разработка портала для ВУЗа",
   },
   {
-    userIndex: 6, // Ким Юлия
+    userIndex: 10, // Ким Юлия
     group: "ПИ-19-1",
     course: 4,
     majorIndex: 1, // Программная инженерия
+    currentPracticeType: "pre_diploma" as const,
+    projectTheme: "Оптимизация баз данных для высоконагруженных систем",
   },
   {
-    userIndex: 7, // Омаров Нурлан
+    userIndex: 11, // Омаров Нурлан
     group: "ИС-21-2",
     course: 2,
     majorIndex: 0, // Информационные системы
+    currentPracticeType: "educational" as const,
+    projectTheme: "Разработка микросервиса на Java",
   },
   {
-    userIndex: 8, // Ибраева Сабина
+    userIndex: 12, // Ибраева Сабина
     group: "МЕН-20-1",
     course: 3,
     majorIndex: 3, // Менеджмент
+    currentPracticeType: "production" as const,
+    projectTheme: "Анализ бизнес-процессов ИТ-компании",
   },
   {
-    userIndex: 9, // Тимофеев Алексей
+    userIndex: 13, // Тимофеев Алексей
     group: "ПИ-20-1",
     course: 3,
     majorIndex: 1, // Программная инженерия
+    currentPracticeType: "production" as const,
+    projectTheme: "Создание UI/UX дизайна мобильного приложения",
   },
 ];
 
@@ -457,8 +527,10 @@ export const APPLICATIONS = [
   },
   {
     studentIndex: 2, // Омаров
-    vacancyIndex: 2, // Стажер в банк (Сбербанк)
+    vacancyIndex: 2, // Стажер в банк (Сбербанк - ПРАКТИКА)
     status: "rejected" as const,
+    practiceType: "educational" as const,
+    projectTheme: "Изучение внутренних процессов банковской сферы",
     coverLetter:
       "Хочу пройти стажировку в банке для получения опыта enterprise-разработки.",
     responseMessage:
@@ -480,8 +552,10 @@ export const APPLICATIONS = [
   },
   {
     studentIndex: 0, // Ахметов
-    vacancyIndex: 6, // Стажер по ИБ (Касперский)
+    vacancyIndex: 6, // ИБ (Касперский - ПРАКТИКА)
     status: "pending" as const,
+    practiceType: "production" as const,
+    projectTheme: "Разработка портала для ВУЗа",
     coverLetter:
       "Интересуюсь информационной безопасностью, хочу развиваться в этой сфере. Готов учиться и применять свои знания на практике.",
   },
@@ -492,6 +566,22 @@ export const APPLICATIONS = [
     coverLetter:
       "Хочу получить опыт работы в крупной нефтегазовой компании. Готов выполнять задачи по автоматизации и поддержке систем.",
   },
+  {
+    studentIndex: 3, // Ибраева
+    vacancyIndex: 8, // Телеком (МТС - ПРАКТИКА)
+    status: "pending" as const,
+    practiceType: "production" as const,
+    projectTheme: "Анализ бизнес-процессов ИТ-компании",
+    coverLetter: "Очень заинтересована в практике в вашей компании.",
+  },
+  {
+    studentIndex: 1, // Ким
+    vacancyIndex: 9, // СУБД (Яндекс - ПРАКТИКА)
+    status: "pending" as const,
+    practiceType: "pre_diploma" as const,
+    projectTheme: "Оптимизация баз данных для высоконагруженных систем",
+    coverLetter: "Обожаю базы данных и оптимизацию запросов. Готова работать и учиться.",
+  }
 ];
 
 // ==================== ПРЕПОДАВАТЕЛИ ====================
@@ -519,6 +609,26 @@ export const ORGANIZATION_REPRESENTATIVES = [
     userIndex: 4, // Нурсултанова А.Е.
     organizationIndex: 0, // Сбербанк
     position: "Менеджер по персоналу",
+  },
+  {
+    userIndex: 5, // Волков Сергей
+    organizationIndex: 2, // Газпром
+    position: "HR-специалист",
+  },
+  {
+    userIndex: 6, // Морозова Анна
+    organizationIndex: 3, // Лаборатория Касперского
+    position: "Recruiter",
+  },
+  {
+    userIndex: 7, // Соколов Иван
+    organizationIndex: 5, // МТС
+    position: "HR",
+  },
+  {
+    userIndex: 8, // Лебедева Мария
+    organizationIndex: 6, // VK
+    position: "HR",
   },
 ];
 
