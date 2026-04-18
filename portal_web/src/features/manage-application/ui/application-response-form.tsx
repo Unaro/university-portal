@@ -43,7 +43,6 @@ export function ApplicationResponseForm({ applicationId }: ApplicationResponseFo
         <Textarea
           name="message"
           placeholder="Напишите сообщение кандидату (время собеседования или причина отказа)..."
-          required
           className="min-h-[100px] resize-none bg-card text-sm"
         />
         <div className="grid grid-cols-2 gap-2">

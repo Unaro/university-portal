@@ -50,6 +50,11 @@ export async function processUniversityApplication(
      return { success: false, message: "ВУЗ одобряет только заявки на практику." };
   }
 
+  // 3.5 Проверка комментария при отказе
+  if (newStatus === "rejected" && (!responseMessage || responseMessage.trim().length === 0)) {
+    return { success: false, message: "При отказе необходимо указать причину." };
+  }
+
   try {
     // 4. Обновляем статус и сообщение
     await db

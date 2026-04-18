@@ -55,6 +55,11 @@ export async function processApplication(
     return { success: false, message: "Вы не можете управлять заявками чужой организации." };
   }
 
+  // 3.5 Проверка комментария при отказе
+  if (newStatus === "rejected" && (!responseMessage || responseMessage.trim().length === 0)) {
+    return { success: false, message: "При отказе необходимо указать причину." };
+  }
+
   try {
     // 4. Обновляем статус и сообщение
     await db

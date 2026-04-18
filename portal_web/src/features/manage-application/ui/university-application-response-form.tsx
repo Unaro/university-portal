@@ -38,8 +38,7 @@ export function UniversityApplicationResponseForm({ applicationId }: UniversityA
       <form action={dispatch} className="space-y-3">
         <Textarea
           name="message"
-          placeholder="Напишите комментарий или причину отказа (будет видна студенту)..."
-          required
+          placeholder="Напишите комментарий или причину отказа..."
           className="min-h-[100px] resize-none bg-card text-sm"
         />
         <div className="grid grid-cols-2 gap-2">
