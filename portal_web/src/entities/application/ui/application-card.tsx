@@ -20,7 +20,12 @@ type ApplicationData = {
     skills: { skill: { id: number; name: string } }[];
     resume: { bio: string | null; fileUrl: string | null } | null;
   };
-  vacancy: { title: string; type: "practice" | "internship" | "job" };
+  vacancy: { 
+    title: string; 
+    type: "practice" | "internship" | "job";
+    startDate?: Date | null;
+    endDate?: Date | null;
+  };
   resumeLink?: string | null;
 };
 
@@ -37,6 +42,11 @@ const practiceTypeMap = {
 
 export function ApplicationCard({ data, actionSlot }: ApplicationCardProps) {
   const getInitials = (name: string) => name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+
+  const formatDate = (date: Date | null | undefined) => {
+    if (!date) return "";
+    return new Date(date).toLocaleDateString("ru-RU");
+  };
 
   return (
     <Card className="overflow-hidden flex flex-col lg:flex-row">
@@ -66,9 +76,20 @@ export function ApplicationCard({ data, actionSlot }: ApplicationCardProps) {
                 <Badge variant="secondary" className="font-normal text-muted-foreground bg-muted mb-2 inline-block">
                   На вакансию: <span className="font-semibold text-foreground ml-1">{data.vacancy.title}</span>
                 </Badge>
-                {data.vacancy.type === "practice" && data.practiceType && (
-                  <div className="text-xs text-muted-foreground">
-                    Тип: <span className="font-semibold">{practiceTypeMap[data.practiceType]}</span>
+                
+                {data.vacancy.type === "practice" && (
+                  <div className="space-y-1">
+                    {data.practiceType && (
+                      <div className="text-xs text-muted-foreground">
+                        Тип: <span className="font-semibold">{practiceTypeMap[data.practiceType]}</span>
+                      </div>
+                    )}
+                    {(data.vacancy.startDate || data.vacancy.endDate) && (
+                      <div className="text-xs text-orange-600 dark:text-orange-400 font-medium flex items-center justify-end gap-1">
+                        <Calendar size={12} />
+                        {formatDate(data.vacancy.startDate)} — {formatDate(data.vacancy.endDate)}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

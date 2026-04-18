@@ -1,6 +1,6 @@
 // src/entities/vacancy/ui/vacancy-card.tsx
 import Link from "next/link";
-import { Building2, Clock, MapPin } from "lucide-react";
+import { Building2, Clock, MapPin, Calendar } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Badge } from "@/shared/ui/badge";
@@ -18,6 +18,11 @@ export function VacancyCard({ data }: { data: VacancyCardProps }) {
   const approvedCount = data.applications?.length || 0;
   const totalSpots = data.availableSpots;
 
+  const formatDateShort = (date: Date | null) => {
+    if (!date) return "";
+    return new Date(date).toLocaleDateString("ru-RU", { day: '2-digit', month: '2-digit' });
+  };
+
   return (
     <Card className="hover:shadow-md transition-shadow border-muted group h-full">
       <CardContent className="p-6">
@@ -28,18 +33,28 @@ export function VacancyCard({ data }: { data: VacancyCardProps }) {
                 <h3 className="text-xl font-bold text-primary group-hover:text-primary/80 transition-colors">
                   <Link href={`/practices/${data.id}`}>{data.title}</Link>
                 </h3>
-                <div className="flex items-center gap-2 text-muted-foreground text-sm mt-1">
-                  <Building2 className="h-4 w-4" />
-                  <span className="font-medium text-foreground">
-                    {data.organization.name}
-                  </span>
+                <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-muted-foreground text-sm mt-1">
+                  <div className="flex items-center gap-1.5">
+                    <Building2 className="h-4 w-4" />
+                    <span className="font-medium text-foreground">
+                      {data.organization.name}
+                    </span>
+                  </div>
+
+                  {(data.startDate || data.endDate) && (
+                    <div className="flex items-center gap-1.5 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 px-2 py-0.5 rounded text-xs font-semibold border border-orange-100 dark:border-orange-800">
+                      <Calendar className="h-3.5 w-3.5" />
+                      {formatDateShort(data.startDate)} — {formatDateShort(data.endDate)}
+                    </div>
+                  )}
+
                   {data.salary && (
-                    <span className="text-green-600 dark:text-green-400 font-semibold bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded text-xs border border-green-100 dark:border-green-800 ml-2">
+                    <span className="text-green-600 dark:text-green-400 font-semibold bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded text-xs border border-green-100 dark:border-green-800">
                       {data.salary}
                     </span>
                   )}
                   {totalSpots && (
-                    <span className="text-blue-600 dark:text-blue-400 font-semibold bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded text-xs border border-blue-100 dark:border-blue-800 ml-2">
+                    <span className="text-blue-600 dark:text-blue-400 font-semibold bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded text-xs border border-blue-100 dark:border-blue-800">
                       Мест: {totalSpots - approvedCount} / {totalSpots}
                     </span>
                   )}

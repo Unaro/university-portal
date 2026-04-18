@@ -10,10 +10,12 @@ interface PracticesViewProps {
     payment?: string;
     course?: string;
     page?: string;
+    onlyMyMajor?: string;
   };
+  isStudent?: boolean;
 }
 
-export function PracticesView({ searchParams }: PracticesViewProps) {
+export function PracticesView({ searchParams, isStudent }: PracticesViewProps) {
   return (
     <div className="min-h-screen bg-background pb-10">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -28,7 +30,7 @@ export function PracticesView({ searchParams }: PracticesViewProps) {
           <div className="lg:col-span-1">
              {/* Оборачиваем клиентский компонент с useSearchParams */}
              <Suspense fallback={<div className="p-4 bg-card rounded shadow animate-pulse h-64"></div>}>
-                <VacancyFilter />
+                <VacancyFilter isStudent={isStudent} />
              </Suspense>
           </div>
 

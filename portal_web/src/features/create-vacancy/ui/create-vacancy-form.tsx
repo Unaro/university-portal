@@ -104,6 +104,17 @@ export function CreateVacancyForm({ allMajors, allSkills }: CreateVacancyFormPro
               </div>
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="startDate">Дата начала</Label>
+                <Input id="startDate" name="startDate" type="date" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="endDate">Дата окончания</Label>
+                <Input id="endDate" name="endDate" type="date" />
+              </div>
+            </div>
+
             <div className="space-y-2">
                <Label>Разрешенные специальности (Пусто = Все)</Label>
                <input type="hidden" name="majors" value={JSON.stringify(selectedMajors)} />

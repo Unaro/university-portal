@@ -301,8 +301,10 @@ async function seedDatabase() {
       type: v.type,
       salary: v.salary,
       minCourse: v.minCourse,
-      availableSpots: v.availableSpots || null,
-    })))
+      availableSpots: (v as any).availableSpots || null,
+      startDate: v.startDate || null,
+      endDate: v.endDate || null,
+      })))
     .onConflictDoNothing()
     .returning();
   console.log(`  ✓ ${insertedVacancies.length} vacancies`);
@@ -333,10 +335,10 @@ async function seedDatabase() {
       return {
         studentId: insertedStudents[a.studentIndex]!.id!,
         vacancyId: vacancy.id!,
-        status: a.status,
+        status: a.status as "pending" | "approved" | "rejected",
         universityApprovalStatus: (vacancy.type === "practice" ? (a.status === "pending" ? "pending" : "approved") : "not_required") as "pending" | "approved" | "not_required" | "rejected",
-        practiceType: vacancy.type === "practice" ? (a.practiceType || student.currentPracticeType) : null,
-        projectTheme: vacancy.type === "practice" ? (a.projectTheme || student.projectTheme) : null,
+        practiceType: (vacancy.type === "practice" ? (a.practiceType || student.currentPracticeType) : null) as "educational" | "production" | "pre_diploma" | null,
+        projectTheme: (vacancy.type === "practice" ? (a.projectTheme || student.projectTheme) : null) as string | null,
         coverLetter: a.coverLetter,
         responseMessage: a.responseMessage,
       };

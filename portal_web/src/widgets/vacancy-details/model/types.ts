@@ -8,6 +8,8 @@ export interface VacancyDetailsProps {
     type: string;
     availableSpots?: number | null;
     approvedCount: number;
+    startDate?: Date | null;
+    endDate?: Date | null;
     createdAt: Date | null;
     organization: {
       name: string;
@@ -22,4 +24,5 @@ export interface VacancyDetailsProps {
   canApply: boolean;
   isLoggined: boolean;
   isFull: boolean;
+  errorReason?: string;
 }

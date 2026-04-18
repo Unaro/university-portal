@@ -36,6 +36,7 @@ export async function applyToVacancy(vacancyId: number): Promise<ActionResponse>
     where: eq(vacancies.id, vacancyId),
     with: { 
       organization: true,
+      allowedMajors: true, // <--- НОВОЕ
       applications: {
         where: eq(applications.status, "approved"),
         columns: { id: true }
@@ -45,6 +46,18 @@ export async function applyToVacancy(vacancyId: number): Promise<ActionResponse>
 
   if (!vacancy || !vacancy.isActive || vacancy.organization.verificationStatus !== "approved") {
     return { success: false, message: "Вакансия не найдена, неактивна или организация не подтверждена.", code: "NOT_FOUND" };
+  }
+
+  // --- ПРОВЕРКА ОГРАНИЧЕНИЙ (НОВОЕ) ---
+  const courseMatch = (studentProfile.course ?? 0) >= (vacancy.minCourse ?? 1);
+  const allowedMajorIds = vacancy.allowedMajors.map(m => m.majorId);
+  const majorMatch = allowedMajorIds.length === 0 || (studentProfile.majorId && allowedMajorIds.includes(studentProfile.majorId));
+
+  if (!courseMatch) {
+    return { success: false, message: `Для данной позиции требуется курс не ниже ${vacancy.minCourse}.`, code: "FORBIDDEN" };
+  }
+  if (!majorMatch) {
+    return { success: false, message: "Ваша специальность не входит в список разрешенных для данной вакансии.", code: "FORBIDDEN" };
   }
 
   // Проверка лимита мест

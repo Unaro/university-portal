@@ -1,9 +1,10 @@
 // src/widgets/vacancy-list/ui/vacancy-list.tsx
 import { db } from "@/db";
-import { vacancies, applications, organizations } from "@/db/schema";
-import { eq, and, desc, gte, inArray, isNotNull, or, ilike, sql, isNull, count, SQL } from "drizzle-orm"; 
+import { vacancies, applications, organizations, vacancySkills, students, vacancyAllowedMajors } from "@/db/schema";
+import { eq, and, desc, inArray, isNotNull, or, ilike, sql, isNull, count, SQL, exists, notExists } from "drizzle-orm"; 
 import { VacancyCard } from "@/entities/vacancy/ui/vacancy-card";
 import { Pagination } from "@/shared/ui/pagination";
+import { auth } from "@/auth";
 
 type InternshipType = "practice" | "internship" | "job";
 
@@ -14,11 +15,13 @@ interface VacancyListProps {
     payment?: string;
     course?: string;
     page?: string;
+    onlyMyMajor?: string;
   };
 }
 
 export async function VacancyList({ searchParams }: VacancyListProps) {
-  const { search, type, payment, course, page = "1" } = searchParams;
+  const session = await auth();
+  const { search, type, payment, course, page = "1", onlyMyMajor } = searchParams;
   const currentPage = Number(page) || 1;
   const limit = 10;
   const offset = (currentPage - 1) * limit;
@@ -28,6 +31,34 @@ export async function VacancyList({ searchParams }: VacancyListProps) {
     eq(vacancies.isActive, true),
     eq(organizations.verificationStatus, "approved")
   ];
+
+  // Фильтр по специальности студента (ПО УМОЛЧАНИЮ ВКЛЮЧЕН, если не 'false')
+  const shouldApplyMajorFilter = session?.user?.role === "student" && onlyMyMajor !== "false";
+
+  if (shouldApplyMajorFilter) {
+    const student = await db.query.students.findFirst({
+      where: eq(students.userId, parseInt(session.user.id)),
+      columns: { majorId: true }
+    });
+
+    if (student?.majorId) {
+      sqlFilters.push(or(
+        // Либо специальности не указаны (доступно всем)
+        notExists(
+          db.select().from(vacancyAllowedMajors).where(eq(vacancyAllowedMajors.vacancyId, vacancies.id))
+        ),
+        // Либо специальность студента в списке разрешенных
+        exists(
+          db.select().from(vacancyAllowedMajors).where(
+            and(
+              eq(vacancyAllowedMajors.vacancyId, vacancies.id),
+              eq(vacancyAllowedMajors.majorId, student.majorId)
+            )
+          )
+        )
+      ));
+    }
+  }
 
   // Поиск по названию или компании
   if (search) {
@@ -53,13 +84,15 @@ export async function VacancyList({ searchParams }: VacancyListProps) {
     sqlFilters.push(isNotNull(vacancies.salary));
   }
 
-  // Курс
+  // Курс (Точное соответствие)
   if (course) {
     const courses = course.split(",").map(Number);
-    sqlFilters.push(gte(vacancies.minCourse, Math.min(...courses))); 
+    if (courses.length > 0) {
+       sqlFilters.push(inArray(vacancies.minCourse, courses));
+    }
   }
 
-  // Фильтр по свободным местам: мест либо нет (null), либо их больше чем approved заявок
+  // Фильтр по свободным местам
   sqlFilters.push(or(
     isNull(vacancies.availableSpots),
     sql`${vacancies.availableSpots} > (SELECT count(*) FROM ${applications} WHERE ${applications.vacancyId} = ${vacancies.id} AND ${applications.status} = 'approved')`
@@ -94,7 +127,7 @@ export async function VacancyList({ searchParams }: VacancyListProps) {
   // Дозагружаем навыки и approvedCount для каждого элемента
   const data = await Promise.all(paginatedData.map(async (item) => {
     const skillsData = await db.query.vacancySkills.findMany({
-      where: eq(vacancies.id, item.vacancy.id),
+      where: (vs, { eq }) => eq(vs.vacancyId, item.vacancy.id),
       with: { skill: true }
     });
     

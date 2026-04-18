@@ -105,6 +105,8 @@ export const vacancies = pgTable("vacancy", {
   salary: text("salary"),
   minCourse: integer("min_course").default(1),
   availableSpots: integer("available_spots"),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

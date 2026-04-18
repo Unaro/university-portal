@@ -1,10 +1,10 @@
-import { Building2, MapPin } from "lucide-react";
+import { Building2, MapPin, Calendar } from "lucide-react";
 import { Badge } from "@/shared/ui/badge";
 import { ApplyButton } from "@/features/apply-vacancy";
 import { VacancyDetailsProps } from "../../model/types";
 import Image from "next/image";
 
-export function VacancyHeader({ data, isApplied, canApply, isLoggined, isFull }: VacancyDetailsProps) {
+export function VacancyHeader({ data, isApplied, canApply, isLoggined, isFull, errorReason }: VacancyDetailsProps) {
   return (
     <div className="bg-muted/50 p-6 md:p-8 border-b">
       <div className="flex flex-col md:flex-row justify-between gap-6 items-start">
@@ -26,6 +26,18 @@ export function VacancyHeader({ data, isApplied, canApply, isLoggined, isFull }:
                 )}
                 {data.organization.name}
              </div>
+
+             {(data.startDate || data.endDate) && (
+               <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 px-3 py-1 rounded-full border border-orange-100 dark:border-orange-800 font-semibold shadow-sm">
+                 <Calendar className="h-4 w-4" />
+                 <span>
+                    {data.startDate ? new Date(data.startDate).toLocaleDateString("ru-RU") : "..."} 
+                    {" — "}
+                    {data.endDate ? new Date(data.endDate).toLocaleDateString("ru-RU") : "..."}
+                 </span>
+               </div>
+             )}
+
              {data.organization.contacts && (
                 <div className="flex items-center gap-1">
                     <MapPin className="h-4 w-4" /> {data.organization.contacts.split(',')[0]}
@@ -62,13 +74,10 @@ export function VacancyHeader({ data, isApplied, canApply, isLoggined, isFull }:
               <ApplyButton
                 vacancyId={data.id}
                 isApplied={isApplied}
-                disabled={!canApply || isFull}
+                disabled={!canApply}
               />
-              {!isApplied && !isFull && !canApply && (
-                  <p className="text-xs text-destructive text-center">Заполните профиль для отклика</p>
-              )}
-              {!isApplied && isFull && (
-                  <p className="text-xs text-destructive text-center font-medium">Свободных мест больше нет</p>
+              {!isApplied && !canApply && errorReason && (
+                  <p className="text-xs text-destructive text-center font-medium">{errorReason}</p>
               )}
             </div>
           )}

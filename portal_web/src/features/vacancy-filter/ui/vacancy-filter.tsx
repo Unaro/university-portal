@@ -3,32 +3,41 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
+import { useTransition } from "react";
 import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { Label } from "@/shared/ui/label";
 import { Card } from "@/shared/ui/card";
 import { Separator } from "@/shared/ui/separator";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, Loader2 } from "lucide-react";
 
-export function VacancyFilter() {
+interface VacancyFilterProps {
+  isStudent?: boolean;
+}
+
+export function VacancyFilter({ isStudent }: VacancyFilterProps) {
   const searchParams = useSearchParams();
   const { replace } = useRouter();
+  const [isPending, startTransition] = useTransition();
 
-  // 1. Обработка поиска (Debounce чтобы не спамить в URL)
+  // 1. Обработка поиска
   const handleSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams);
     if (term) params.set("search", term);
     else params.delete("search");
-    replace(`?${params.toString()}`, { scroll: false });
+    
+    params.delete("page");
+    
+    startTransition(() => {
+        replace(`?${params.toString()}`, { scroll: false });
+    });
   }, 300);
 
   // 2. Обработка чекбоксов
-  // type: 'practice' | 'internship' | 'job'
-  // payment: 'paid'
   const handleFilter = (key: string, value: string, checked: boolean) => {
     const params = new URLSearchParams(searchParams);
-    const current = params.get(key)?.split(",") || []; // Поддержка множественного выбора через запятую
+    const current = params.get(key)?.split(",") || [];
 
     let updated: string[];
     if (checked) {
@@ -43,43 +52,79 @@ export function VacancyFilter() {
         params.delete(key);
     }
 
-    // Сбрасываем пагинацию при изменении фильтров
     params.delete("page");
     
-    replace(`?${params.toString()}`, { scroll: false });
+    startTransition(() => {
+        replace(`?${params.toString()}`, { scroll: false });
+    });
   };
 
   const resetFilters = () => {
-    replace("?");
+    startTransition(() => {
+        replace("?");
+    });
   };
 
-  // Хелпер для проверки, активен ли чекбокс
   const isChecked = (key: string, value: string) => {
       const val = searchParams.get(key);
       return val?.split(",").includes(value) || false;
   };
 
   return (
-    <div className="space-y-6">
-      {/* ПОИСК (Мобильный + Десктоп) */}
+    <div className={`space-y-6 transition-opacity duration-200 ${isPending ? "opacity-70 pointer-events-none" : ""}`}>
+      {/* ПОИСК */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        {isPending ? (
+          <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary animate-spin" />
+        ) : (
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        )}
         <Input
           placeholder="Поиск по названию..."
-          className="pl-10 bg-card"
+          className="pl-10 bg-card transition-all focus:ring-primary/20"
           defaultValue={searchParams.get("search")?.toString()}
           onChange={(e) => handleSearch(e.target.value)}
         />
       </div>
 
-      {/* САЙДБАР С ФИЛЬТРАМИ (Desktop) */}
-      <Card className="p-4 border-muted bg-muted/50 hidden lg:block">
+      {/* САЙДБАР С ФИЛЬТРАМИ */}
+      <Card className="p-4 border-muted bg-muted/50 hidden lg:block relative overflow-hidden">
+        {isPending && <div className="absolute inset-0 bg-background/10 backdrop-blur-[1px] z-10" />}
+        
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-semibold flex items-center gap-2"><Filter className="h-4 w-4" /> Фильтры</h3>
           <Button variant="ghost" size="sm" className="h-auto px-2 text-xs text-muted-foreground hover:text-destructive" onClick={resetFilters}>Сбросить</Button>
         </div>
         
         <div className="space-y-5">
+          {isStudent && (
+            <>
+              <div>
+                <h4 className="text-sm font-medium mb-3">Персонализация</h4>
+                <div className="space-y-2">
+                  <FilterCheckbox 
+                    label="Только для моей специальности" 
+                    // По умолчанию true, если нет 'false'
+                    checked={searchParams.get("onlyMyMajor") !== "false"} 
+                    onCheckedChange={(c) => {
+                      const params = new URLSearchParams(searchParams);
+                      // Если снимаем галочку -> ставим 'false'
+                      if (!c) params.set("onlyMyMajor", "false");
+                      // Если ставим -> удаляем 'false' (возвращаем дефолт) или ставим 'true'
+                      else params.delete("onlyMyMajor");
+                      
+                      params.delete("page");
+                      startTransition(() => {
+                        replace(`?${params.toString()}`, { scroll: false });
+                      });
+                    }} 
+                  />
+                </div>
+              </div>
+              <Separator />
+            </>
+          )}
+
           {/* Тип занятости */}
           <div>
             <h4 className="text-sm font-medium mb-3">Тип практики</h4>
@@ -107,7 +152,7 @@ export function VacancyFilter() {
           <div>
              <h4 className="text-sm font-medium mb-3">Для курса</h4>
              <div className="space-y-2">
-                {[1, 2, 3, 4].map(course => (
+                {[1, 2, 3, 4, 5, 6].map(course => (
                     <FilterCheckbox 
                         key={course} 
                         label={`${course} курс`} 

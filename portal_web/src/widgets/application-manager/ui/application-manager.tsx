@@ -108,7 +108,7 @@ export async function ApplicationManager({ userId, statusFilter, vacancyIdFilter
     where: inArray(applications.id, ids),
     columns: { id: true, status: true, coverLetter: true, responseMessage: true, createdAt: true, universityApprovalStatus: true, practiceType: true, projectTheme: true },
     with: {
-      vacancy: { columns: { title: true, type: true } },
+      vacancy: { columns: { title: true, type: true, startDate: true, endDate: true } },
       student: {
         columns: { id: true, course: true, majorId: true },
         with: {
