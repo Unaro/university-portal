@@ -9,6 +9,7 @@ interface PracticesViewProps {
     type?: string;
     payment?: string;
     course?: string;
+    page?: string;
   };
 }
 

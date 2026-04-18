@@ -1,23 +1,28 @@
-// src/features/manage-application/ui/application-manager.tsx
+// src/widgets/application-manager/ui/application-manager.tsx
 import { db } from "@/db";
 import { applications, organizationRepresentatives, vacancies } from "@/db/schema";
-import { eq, desc, inArray } from "drizzle-orm";
+import { eq, desc, inArray, or, ne, count, and } from "drizzle-orm";
 import { ApplicationCard } from "@/entities/application/ui/application-card";
 import { ApplicationResponseForm } from "@/features/manage-application/ui/application-response-form";
 import { getFileUrl } from "@/lib/s3";
 import { Button } from "@/shared/ui/button";
 import { CheckCircle2, XCircle, Clock, Briefcase } from "lucide-react";
 import Link from "next/link";
-import { StatsCard } from "@/shared/ui";
+import { StatsCard, Pagination } from "@/shared/ui";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/shared/ui/tabs";
 
 interface ApplicationManagerProps {
   userId: number;
   statusFilter: string;
   vacancyIdFilter?: number;
+  page?: string;
 }
 
-export async function ApplicationManager({ userId, statusFilter, vacancyIdFilter }: ApplicationManagerProps) {
+export async function ApplicationManager({ userId, statusFilter, vacancyIdFilter, page = "1" }: ApplicationManagerProps) {
+  const currentPage = Number(page) || 1;
+  const limit = 10;
+  const offset = (currentPage - 1) * limit;
+
   const rep = await db.query.organizationRepresentatives.findFirst({
     where: eq(organizationRepresentatives.userId, userId),
   });
@@ -46,11 +51,61 @@ export async function ApplicationManager({ userId, statusFilter, vacancyIdFilter
     );
   }
 
-  // Определяем, какие вакансии мы смотрим: либо одну конкретную, либо все вакансии организации
+  // 1. Определяем IDs вакансий для фильтрации
   const vacancyIds = vacancyIdFilter ? [vacancyIdFilter] : orgVacancies.map((v) => v.id);
 
-  const rawApps = await db.query.applications.findMany({
-    where: inArray(applications.vacancyId, vacancyIds),
+  // 2. Статистика (всегда по всем видимым заявкам в выбранном контексте вакансий)
+  const allAppsForContext = await db
+    .select({
+      status: applications.status,
+      universityApprovalStatus: applications.universityApprovalStatus,
+      vacancyType: vacancies.type,
+    })
+    .from(applications)
+    .innerJoin(vacancies, eq(applications.vacancyId, vacancies.id))
+    .where(inArray(applications.vacancyId, vacancyIds));
+
+  const stats = {
+    total: allAppsForContext.filter(a => a.vacancyType !== "practice" || a.universityApprovalStatus === "approved").length,
+    pending: allAppsForContext.filter(a => a.status === "pending" && (a.vacancyType !== "practice" || a.universityApprovalStatus === "approved")).length,
+    approved: allAppsForContext.filter(a => a.status === "approved").length,
+    rejected: allAppsForContext.filter(a => a.status === "rejected" && (a.vacancyType !== "practice" || a.universityApprovalStatus === "approved")).length,
+    universityPending: allAppsForContext.filter(a => a.vacancyType === "practice" && a.universityApprovalStatus === "pending").length,
+  };
+
+  // 3. Условие для пагинации (учитывая фильтр статуса)
+  const sqlWhere = and(
+    inArray(applications.vacancyId, vacancyIds),
+    or(
+      ne(vacancies.type, "practice"),
+      eq(applications.universityApprovalStatus, "approved")
+    ),
+    statusFilter !== "all" ? eq(applications.status, statusFilter as any) : undefined
+  );
+
+  const [countResult] = await db
+    .select({ value: count() })
+    .from(applications)
+    .innerJoin(vacancies, eq(applications.vacancyId, vacancies.id))
+    .where(sqlWhere);
+
+  const totalFiltered = countResult.value;
+  const totalPages = Math.ceil(totalFiltered / limit);
+
+  // 4. Запрос данных текущей страницы (сначала берем IDs, потом полные данные)
+  const paginatedIdsResult = await db
+    .select({ id: applications.id })
+    .from(applications)
+    .innerJoin(vacancies, eq(applications.vacancyId, vacancies.id))
+    .where(sqlWhere)
+    .orderBy(desc(applications.createdAt))
+    .limit(limit)
+    .offset(offset);
+
+  const ids = paginatedIdsResult.map(p => p.id);
+
+  const rawApps = ids.length > 0 ? await db.query.applications.findMany({
+    where: inArray(applications.id, ids),
     columns: { id: true, status: true, coverLetter: true, responseMessage: true, createdAt: true, universityApprovalStatus: true, practiceType: true, projectTheme: true },
     with: {
       vacancy: { columns: { title: true, type: true } },
@@ -65,27 +120,13 @@ export async function ApplicationManager({ userId, statusFilter, vacancyIdFilter
       },
     },
     orderBy: [desc(applications.createdAt)],
-  });
-
-  const visibleApps = rawApps.filter(
-    (app) => app.vacancy.type !== "practice" || app.universityApprovalStatus === "approved"
-  );
-
-  const stats = {
-    total: visibleApps.length,
-    pending: visibleApps.filter((a) => a.status === "pending").length,
-    approved: visibleApps.filter((a) => a.status === "approved").length,
-    rejected: visibleApps.filter((a) => a.status === "rejected").length,
-    universityPending: rawApps.filter(a => a.vacancy.type === "practice" && a.universityApprovalStatus === "pending").length,
-  };
+  }) : [];
 
   const filteredApps = await Promise.all(
-    visibleApps
-      .filter((app) => statusFilter === "all" || app.status === statusFilter)
-      .map(async (app) => ({
-        ...app,
-        resumeLink: app.student.resume?.fileUrl ? await getFileUrl(app.student.resume.fileUrl) : null,
-      }))
+    rawApps.map(async (app) => ({
+      ...app,
+      resumeLink: app.student.resume?.fileUrl ? await getFileUrl(app.student.resume.fileUrl) : null,
+    }))
   );
 
   const vacancyQuery = vacancyIdFilter ? `&vacancy=${vacancyIdFilter}` : "";
@@ -143,39 +184,46 @@ export async function ApplicationManager({ userId, statusFilter, vacancyIdFilter
           </p>
         </div>
       ) : (
-        <div className="grid gap-6">
-          {filteredApps.map((app) => (
-            <ApplicationCard
-              key={app.id}
-              data={app}
-              actionSlot={
-                app.status === "pending" ? (
-                  <ApplicationResponseForm applicationId={app.id} />
-                ) : (
-                  <div className="h-full flex flex-col">
-                    <div
-                      className={`mb-4 flex items-center gap-2 font-bold text-sm px-3 py-2 rounded-md w-fit ${
-                        app.status === "approved"
-                          ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
-                          : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
-                      }`}
-                    >
-                      {app.status === "approved" ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
-                      {app.status === "approved" ? "Вы пригласили" : "Вы отказали"}
-                    </div>
-                    <div className="flex-grow">
-                      <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Ваш ответ:</p>
-                      <div className="bg-card border rounded-lg p-3 text-sm text-muted-foreground italic relative">
-                        <div className="absolute -top-1.5 left-4 w-3 h-3 bg-card border-t border-l transform rotate-45" />
-                        &ldquo;{app.responseMessage}&rdquo;
+        <>
+          <div className="grid gap-6">
+            {filteredApps.map((app) => (
+              <ApplicationCard
+                key={app.id}
+                data={app}
+                actionSlot={
+                  app.status === "pending" ? (
+                    <ApplicationResponseForm applicationId={app.id} />
+                  ) : (
+                    <div className="h-full flex flex-col">
+                      <div
+                        className={`mb-4 flex items-center gap-2 font-bold text-sm px-3 py-2 rounded-md w-fit ${
+                          app.status === "approved"
+                            ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+                            : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
+                        }`}
+                      >
+                        {app.status === "approved" ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
+                        {app.status === "approved" ? "Вы пригласили" : "Вы отказали"}
+                      </div>
+                      <div className="flex-grow">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Ваш ответ:</p>
+                        <div className="bg-card border rounded-lg p-3 text-sm text-muted-foreground italic relative">
+                          <div className="absolute -top-1.5 left-4 w-3 h-3 bg-card border-t border-l transform rotate-45" />
+                          &ldquo;{app.responseMessage}&rdquo;
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )
-              }
-            />
-          ))}
-        </div>
+                  )
+                }
+              />
+            ))}
+          </div>
+
+          <Pagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+          />
+        </>
       )}
     </div>
   );

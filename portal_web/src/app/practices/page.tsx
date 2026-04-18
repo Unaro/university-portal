@@ -9,6 +9,7 @@ interface PageProps {
     search?: string;
     type?: string;
     course?: string;
+    page?: string;
   }>;
 }
 

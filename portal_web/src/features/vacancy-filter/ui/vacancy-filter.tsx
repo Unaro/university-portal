@@ -42,6 +42,9 @@ export function VacancyFilter() {
     } else {
         params.delete(key);
     }
+
+    // Сбрасываем пагинацию при изменении фильтров
+    params.delete("page");
     
     replace(`?${params.toString()}`, { scroll: false });
   };

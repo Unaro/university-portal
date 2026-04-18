@@ -1,8 +1,9 @@
 // src/widgets/vacancy-list/ui/vacancy-list.tsx
 import { db } from "@/db";
-import { vacancies, applications } from "@/db/schema";
-import { eq, and, desc, gte, inArray, isNotNull } from "drizzle-orm"; // Убрали like
+import { vacancies, applications, organizations } from "@/db/schema";
+import { eq, and, desc, gte, inArray, isNotNull, or, ilike, sql, isNull, count, SQL } from "drizzle-orm"; 
 import { VacancyCard } from "@/entities/vacancy/ui/vacancy-card";
+import { Pagination } from "@/shared/ui/pagination";
 
 type InternshipType = "practice" | "internship" | "job";
 
@@ -12,14 +13,30 @@ interface VacancyListProps {
     type?: string;
     payment?: string;
     course?: string;
+    page?: string;
   };
 }
 
 export async function VacancyList({ searchParams }: VacancyListProps) {
-  const { search, type, payment, course } = searchParams;
+  const { search, type, payment, course, page = "1" } = searchParams;
+  const currentPage = Number(page) || 1;
+  const limit = 10;
+  const offset = (currentPage - 1) * limit;
 
-  // 1. Базовые фильтры SQL (Жесткие критерии)
-  const filters = [eq(vacancies.isActive, true)];
+  // 1. Формируем SQL фильтры
+  const sqlFilters: (SQL | undefined)[] = [
+    eq(vacancies.isActive, true),
+    eq(organizations.verificationStatus, "approved")
+  ];
+
+  // Поиск по названию или компании
+  if (search) {
+    const term = `%${decodeURIComponent(search).toLowerCase().trim()}%`;
+    sqlFilters.push(or(
+      ilike(vacancies.title, term),
+      ilike(organizations.name, term)
+    ));
+  }
 
   // Тип
   if (type) {
@@ -27,53 +44,71 @@ export async function VacancyList({ searchParams }: VacancyListProps) {
       ["practice", "internship", "job"].includes(t)
     );
     if (types.length > 0) {
-      filters.push(inArray(vacancies.type, types));
+      sqlFilters.push(inArray(vacancies.type, types));
     }
   }
 
   // Оплата
   if (payment === "paid") {
-    filters.push(isNotNull(vacancies.salary));
+    sqlFilters.push(isNotNull(vacancies.salary));
   }
 
   // Курс
   if (course) {
     const courses = course.split(",").map(Number);
-    filters.push(gte(vacancies.minCourse, Math.min(...courses))); 
+    sqlFilters.push(gte(vacancies.minCourse, Math.min(...courses))); 
   }
 
-  // 2. Запрос к БД
-  const rawData = await db.query.vacancies.findMany({
-    where: and(...filters),
-    with: {
-      organization: true,
-      requiredSkills: { with: { skill: true } },
-      applications: {
-        where: eq(applications.status, "approved"),
-        columns: { id: true }
-      }
-    },
-    orderBy: [desc(vacancies.createdAt)],
-  });
+  // Фильтр по свободным местам: мест либо нет (null), либо их больше чем approved заявок
+  sqlFilters.push(or(
+    isNull(vacancies.availableSpots),
+    sql`${vacancies.availableSpots} > (SELECT count(*) FROM ${applications} WHERE ${applications.vacancyId} = ${vacancies.id} AND ${applications.status} = 'approved')`
+  ));
 
-  // 3. ✅ JS ПОИСК (И по вакансии, И по компании)
-  const data = rawData.filter((vac) => {
-    // ❌ Исключаем вакансии от неподтвержденных компаний
-    if (vac.organization.verificationStatus !== "approved") return false;
+  // Очищаем массив фильтров от undefined
+  const finalFilter = and(...sqlFilters.filter((f): f is SQL => f !== undefined));
 
-    // ❌ Скрываем вакансии, где набор закрыт (лимит достигнут)
-    if (vac.availableSpots && vac.applications.length >= vac.availableSpots) return false;
+  // 2. Получаем общее количество записей для пагинации
+  const [totalResult] = await db
+    .select({ value: count() })
+    .from(vacancies)
+    .innerJoin(organizations, eq(vacancies.organizationId, organizations.id))
+    .where(finalFilter);
+  
+  const totalItems = totalResult.value;
+  const totalPages = Math.ceil(totalItems / limit);
 
-    if (!search) return true;
+  // 3. Запрос основных данных с пагинацией через db.select
+  const paginatedData = await db
+    .select({
+      vacancy: vacancies,
+      organization: organizations,
+    })
+    .from(vacancies)
+    .innerJoin(organizations, eq(vacancies.organizationId, organizations.id))
+    .where(finalFilter)
+    .orderBy(desc(vacancies.createdAt))
+    .limit(limit)
+    .offset(offset);
+
+  // Дозагружаем навыки и approvedCount для каждого элемента
+  const data = await Promise.all(paginatedData.map(async (item) => {
+    const skillsData = await db.query.vacancySkills.findMany({
+      where: eq(vacancies.id, item.vacancy.id),
+      with: { skill: true }
+    });
     
-    // Приводим все к нижнему регистру для нечувствительности к регистру
-    const term = decodeURIComponent(search).toLowerCase().trim();
-    const title = vac.title.toLowerCase();
-    const orgName = vac.organization.name.toLowerCase();
+    const appsCount = await db.select({ value: count() })
+      .from(applications)
+      .where(and(eq(applications.vacancyId, item.vacancy.id), eq(applications.status, "approved")));
 
-    // Ищем вхождение строки поиска в названии вакансии ИЛИ в названии компании
-    return title.includes(term) || orgName.includes(term);
-  });
+    return {
+      ...item.vacancy,
+      organization: item.organization,
+      requiredSkills: skillsData,
+      applications: Array(appsCount[0].value).fill({}) // Для совместимости с VacancyCardProps
+    };
+  }));
 
   // Если ничего не найдено
   if (data.length === 0) {
@@ -88,15 +123,22 @@ export async function VacancyList({ searchParams }: VacancyListProps) {
   }
 
   return (
-    <div>
-        <p className="text-muted-foreground mb-4 text-sm">
-            Найдено {data.length} предложений {search && `по запросу "${decodeURIComponent(search)}"`}
-        </p>
-        <div className="grid grid-cols-1 gap-4">
-        {data.map((vac) => (
-            <VacancyCard key={vac.id} data={vac} />
-        ))}
+    <div className="flex flex-col gap-6">
+        <div>
+          <p className="text-muted-foreground mb-4 text-sm">
+              Найдено {totalItems} предложений {search && `по запросу "${decodeURIComponent(search)}"`}
+          </p>
+          <div className="grid grid-cols-1 gap-4">
+          {data.map((vac) => (
+              <VacancyCard key={vac.id} data={vac} />
+          ))}
+          </div>
         </div>
+
+        <Pagination 
+          currentPage={currentPage}
+          totalPages={totalPages}
+        />
     </div>
   );
 }

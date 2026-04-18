@@ -12,6 +12,7 @@ interface PageProps {
   searchParams?: {
     status?: string;
     vacancy?: string;
+    page?: string;
   };
 }
 
@@ -22,6 +23,7 @@ export async function ApplicationManagerView({ searchParams }: PageProps) {
 
   const currentStatus = searchParams?.status || "all";
   const vacancyId = searchParams?.vacancy ? parseInt(searchParams.vacancy) : undefined;
+  const page = searchParams?.page || "1";
 
   let vacancyTitle = "";
   if (vacancyId) {
@@ -59,6 +61,7 @@ export async function ApplicationManagerView({ searchParams }: PageProps) {
         userId={parseInt(session.user.id)} 
         statusFilter={currentStatus} 
         vacancyIdFilter={vacancyId}
+        page={page}
       />
     </div>
   );
