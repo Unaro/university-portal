@@ -9,7 +9,10 @@ export type ApplicationWithDetails = typeof applications.$inferSelect & {
 export type VacancyStatus = typeof applications.$inferSelect.status
 
 export type VacancyWithApplications = typeof vacancies.$inferSelect & {
-  applications: { status: VacancyStatus }[];
+  applications: { 
+    status: VacancyStatus;
+    universityApprovalStatus: typeof applications.$inferSelect.universityApprovalStatus;
+  }[];
 };
 
 export interface StudentDashboardProps {

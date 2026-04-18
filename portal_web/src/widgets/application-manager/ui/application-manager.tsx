@@ -76,6 +76,7 @@ export async function ApplicationManager({ userId, statusFilter, vacancyIdFilter
     pending: visibleApps.filter((a) => a.status === "pending").length,
     approved: visibleApps.filter((a) => a.status === "approved").length,
     rejected: visibleApps.filter((a) => a.status === "rejected").length,
+    universityPending: rawApps.filter(a => a.vacancy.type === "practice" && a.universityApprovalStatus === "pending").length,
   };
 
   const filteredApps = await Promise.all(
@@ -92,9 +93,12 @@ export async function ApplicationManager({ userId, statusFilter, vacancyIdFilter
   return (
     <div className="flex flex-col gap-6">
       {/* Статистика */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className={`grid gap-3 ${stats.universityPending > 0 ? "grid-cols-2 md:grid-cols-5" : "grid-cols-2 md:grid-cols-4"}`}>
         <StatsCard variant="mini" icon={<Briefcase size={16} />} label="Всего" value={stats.total} />
         <StatsCard variant="mini" icon={<Clock size={16} />} label="Ждут" value={stats.pending} color="text-yellow-600" />
+        {stats.universityPending > 0 && (
+          <StatsCard variant="mini" icon={<Clock size={16} />} label="В ВУЗе" value={stats.universityPending} color="text-blue-600" />
+        )}
         <StatsCard variant="mini" icon={<CheckCircle2 size={16} />} label="Принято" value={stats.approved} color="text-green-600" />
         <StatsCard variant="mini" icon={<XCircle size={16} />} label="Отказы" value={stats.rejected} color="text-red-600" />
       </div>

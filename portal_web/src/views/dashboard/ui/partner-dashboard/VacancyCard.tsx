@@ -11,9 +11,21 @@ interface VacancyCardProps {
 }
 
 export function VacancyCard({ vacancy }: VacancyCardProps) {
-  const total = vacancy.applications.length;
-  const pending = getStatusCounts("pending", vacancy.applications);
-  const approved = getStatusCounts("approved", vacancy.applications);
+  const isPractice = vacancy.type === "practice";
+
+  // Те, что партнер может видеть (уже одобрено ВУЗом или не практика)
+  const visibleApps = vacancy.applications.filter(a => 
+    !isPractice || a.universityApprovalStatus === "approved"
+  );
+
+  // Те, что висят на модерации в ВУЗе (только для практик)
+  const universityPending = isPractice 
+    ? vacancy.applications.filter(a => a.universityApprovalStatus === "pending").length
+    : 0;
+
+  const total = visibleApps.length;
+  const pending = visibleApps.filter(a => a.status === "pending").length;
+  const approved = visibleApps.filter(a => a.status === "approved").length;
 
   const isFull = vacancy.availableSpots ? approved >= vacancy.availableSpots : false;
 
@@ -33,7 +45,7 @@ export function VacancyCard({ vacancy }: VacancyCardProps) {
 
           <div className="flex flex-wrap gap-3 text-sm">
             <div className="flex items-center gap-1.5 text-muted-foreground">
-              <Users size={15} /> <span className="font-medium">{total}</span> откликов
+              <Users size={15} /> <span className="font-medium">{total}</span> активных заявок
             </div>
             
             {vacancy.availableSpots && (
@@ -47,6 +59,13 @@ export function VacancyCard({ vacancy }: VacancyCardProps) {
                 <Clock size={14} /> {pending} новых
               </div>
             )}
+
+            {universityPending > 0 && (
+              <div className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 font-medium bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded-full text-xs border border-blue-100 dark:border-blue-800">
+                <Clock size={14} /> {universityPending} на модерации ВУЗа
+              </div>
+            )}
+
             {approved > 0 && (
               <div className="flex items-center gap-1.5 text-green-600 dark:text-green-400 font-medium bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full text-xs">
                 <CheckCircle size={14} /> {approved} приглашено

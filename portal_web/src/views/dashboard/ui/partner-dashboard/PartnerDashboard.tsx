@@ -24,7 +24,14 @@ export async function PartnerDashboard({ userId }: PartnerDashboardProps) {
 
   const myVacancies = await db.query.vacancies.findMany({
     where: eq(vacancies.organizationId, rep.organization.id),
-    with: { applications: { columns: { status: true } } },
+    with: { 
+      applications: { 
+        columns: { 
+          status: true,
+          universityApprovalStatus: true
+        } 
+      } 
+    },
     orderBy: [desc(vacancies.createdAt)],
   }) as VacancyWithApplications[];
 
