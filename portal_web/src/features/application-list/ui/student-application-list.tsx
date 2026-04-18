@@ -1,5 +1,5 @@
 // src/features/application-list/ui/student-application-list.tsx
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/shared/ui/badge";
 import { Briefcase } from "lucide-react";
 import { ApplicationStatus } from "@/shared/types/db";
 

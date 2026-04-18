@@ -1,6 +1,6 @@
 // src/entities/material/ui/material-row.tsx
 import { File, FileBadge, FileText, Eye, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { materials } from "@/db/schema";
 
 interface MaterialRowProps {

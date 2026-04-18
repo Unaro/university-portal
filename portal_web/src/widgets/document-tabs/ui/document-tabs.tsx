@@ -1,10 +1,10 @@
 // src/widgets/document-tabs/ui/document-tabs.tsx
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/shared/ui/card";
 import { MaterialRow } from "@/entities/material/ui/material-row";
 import { MaterialForm } from "@/features/manage-materials/ui/material-form"; // Импортируем форму
 import { Material } from "@/shared/types/db";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { Trash2 } from "lucide-react";
 import { deleteMaterial } from "@/app/actions/material";
 

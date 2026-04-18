@@ -1,7 +1,7 @@
 // src/widgets/header/ui/header.tsx
 import { auth } from "@/auth";
 import { HeaderClient } from "./header-client";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { ThemeToggle } from "@/shared/ui/theme-toggle";
 
 export async function Header() {
   const session = await auth();

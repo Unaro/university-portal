@@ -1,7 +1,7 @@
 // src/entities/application/ui/application-card.tsx
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
+import { Badge } from "@/shared/ui/badge";
+import { Card } from "@/shared/ui/card";
 import { Calendar, Mail, FileText, Download } from "lucide-react";
 
 type ApplicationData = {

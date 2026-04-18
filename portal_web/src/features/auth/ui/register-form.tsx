@@ -4,11 +4,11 @@
 import { useActionState, useEffect } from "react";
 import { registerUser } from "@/app/actions/register"; // Студент
 import { registerPartner } from "@/app/actions/register-partner"; // Партнер
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Label } from "@/shared/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { Checkbox } from "@/shared/ui/checkbox";
 import { Building2, GraduationCap, User } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";

@@ -1,0 +1,63 @@
+import Link from "next/link";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
+import { Users, Clock, CheckCircle, Trash2 } from "lucide-react";
+import { deleteVacancy } from "@/app/actions/vacancy";
+import { VacancyWithApplications } from "../../model/types";
+import { getStatusCounts } from "../../utils";
+
+interface VacancyCardProps {
+  vacancy: VacancyWithApplications;
+}
+
+
+
+export function VacancyCard({ vacancy }: VacancyCardProps) {
+  const total = vacancy.applications.length;
+  const pending = getStatusCounts("pending", vacancy.applications);
+  const approved = getStatusCounts("approved", vacancy.applications);
+
+  return (
+    <div className="p-5 border rounded-lg bg-card hover:shadow-md transition">
+      <div className="flex flex-col sm:flex-row justify-between gap-4">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="font-bold text-lg">{vacancy.title}</h3>
+            <Badge variant="outline" className="text-xs bg-muted">
+              {vacancy.type === "job" ? "Работа" : vacancy.type === "internship" ? "Стажировка" : "Практика"}
+            </Badge>
+            {!vacancy.isActive && <Badge variant="destructive" className="text-xs">Скрыта</Badge>}
+          </div>
+          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{vacancy.description}</p>
+
+          <div className="flex flex-wrap gap-3 text-sm">
+            <div className="flex items-center gap-1.5 text-muted-foreground">
+              <Users size={15} /> <span className="font-medium">{total}</span> откликов
+            </div>
+            {pending > 0 && (
+              <div className="flex items-center gap-1.5 text-yellow-600 dark:text-yellow-400 font-medium bg-yellow-50 dark:bg-yellow-900/20 px-2 py-0.5 rounded-full text-xs">
+                <Clock size={14} /> {pending} новых
+              </div>
+            )}
+            {approved > 0 && (
+              <div className="flex items-center gap-1.5 text-green-600 dark:text-green-400 font-medium bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full text-xs">
+                <CheckCircle size={14} /> {approved} приглашено
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex sm:flex-col gap-2 sm:items-end min-w-[140px]">
+          <Button variant="secondary" size="sm" asChild className="w-full">
+            <Link href={`/dashboard/applications?vacancy=${vacancy.id}`}>К заявкам →</Link>
+          </Button>
+          <form action={async () => { "use server"; await deleteVacancy(vacancy.id); }} className="w-full">
+            <Button variant="ghost" size="sm" className="w-full text-destructive hover:bg-destructive/10 gap-2">
+              <Trash2 size={14} /> Удалить
+            </Button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}

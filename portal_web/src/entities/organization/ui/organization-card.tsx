@@ -1,9 +1,9 @@
 // src/entities/organization/ui/organization-card.tsx
 import Link from "next/link";
 import { Briefcase, MapPin } from "lucide-react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
 import { organizations } from "@/db/schema";
 import Image from "next/image";
 

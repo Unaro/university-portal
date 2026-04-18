@@ -1,10 +1,10 @@
 // src/views/vacancy-create/ui/vacancy-create-view.tsx
 import { CreateVacancyForm } from "@/features/create-vacancy/ui/create-vacancy-form";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Major } from "@/shared/types/db";
-import { Option } from "@/components/ui/multi-select";
+import { Option } from "@/shared/ui/multi-select";
 
 interface VacancyCreateViewProps {
   majors: Major[];

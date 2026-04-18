@@ -1,5 +1,5 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/shared/ui/card";
 import { StudentProfileForm } from "@/features/profile-edit/ui/student-profile-form";
 import { StudentApplicationList, ApplicationUiItem } from "@/features/application-list/ui/student-application-list";
 import { Major, Resume, Skill } from "@/shared/types/db"; // Импортируем строгие типы

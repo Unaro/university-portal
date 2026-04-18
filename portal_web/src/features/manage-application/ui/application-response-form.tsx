@@ -3,8 +3,8 @@
 import { useActionState, useEffect } from "react";
 // 👇 Импортируем тип состояния вместе с функцией
 import { processApplication, ManageAppActionState } from "@/app/actions/manage-application"; 
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/shared/ui/button";
+import { Textarea } from "@/shared/ui/textarea";
 import { Clock } from "lucide-react";
 import { toast } from "sonner";
 

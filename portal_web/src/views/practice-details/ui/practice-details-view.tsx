@@ -1,6 +1,5 @@
 // src/views/practice-details/ui/practice-details-view.tsx
-import { VacancyDetails } from "@/widgets/vacancy-details/ui/vacancy-details";
-import type { VacancyDetailsProps } from "@/widgets/vacancy-details/ui/vacancy-details";
+import { VacancyDetails, type VacancyDetailsProps } from "@/widgets/vacancy-details";
 
 export function PracticeDetailsView(props: VacancyDetailsProps) {
   return (

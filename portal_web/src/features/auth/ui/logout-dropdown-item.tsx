@@ -1,7 +1,7 @@
 // src/features/auth/ui/logout-dropdown-item.tsx
 "use client";
 
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { DropdownMenuItem } from "@/shared/ui/dropdown-menu";
 import { LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
 

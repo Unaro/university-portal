@@ -4,7 +4,7 @@
 import { useActionState, useEffect } from "react";
 import { applyToVacancy } from "@/app/actions/application";
 import { ActionResponse } from "@/shared/types/action";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { toast } from "sonner";
 
 interface ApplyButtonProps {

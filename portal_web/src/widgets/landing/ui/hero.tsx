@@ -1,7 +1,7 @@
 // src/widgets/landing/ui/hero.tsx
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
 
 interface HeroStats {
   students: number;

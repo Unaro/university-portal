@@ -1,24 +1,16 @@
 // src/views/admin/ui/admin-view.tsx
-import { auth } from "@/auth";
 import { db } from "@/db";
 import { organizations } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
-import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/shared/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import Link from "next/link";
 import { verifyOrganization } from "@/app/actions/admin";
 import { getFileUrl } from "@/lib/s3";
 import { getAdminStats } from "@/app/actions/stats";
+import Image from "next/image";
 
 export async function AdminView() {
-  const session = await auth();
-
-  if (!session?.user) redirect("/login");
-  if (session.user.role !== "university_staff") {
-    return <div className="p-10">Доступ запрещен.</div>;
-  }
-
   const stats = await getAdminStats();
 
   const pendingOrgs = await db.query.organizations.findMany({
@@ -91,8 +83,13 @@ export async function AdminView() {
                             <p className="text-sm text-muted-foreground mt-1">ИИН: {org.iin}</p>
                         </div>
                         {org.logoUrl && (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={org.logoUrl} alt="Logo" className="w-10 h-10 object-contain" />
+                            <Image 
+                              src={org.logoUrl} 
+                              alt="Logo" 
+                              width={40} 
+                              height={40} 
+                              className="object-contain" 
+                            />
                         )}
                       </div>
                   </CardHeader>

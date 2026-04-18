@@ -3,11 +3,11 @@
 
 import { useActionState, useEffect } from "react";
 import { saveResume, ResumeActionState } from "@/app/actions/resume";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/shared/ui/button";
+import { Textarea } from "@/shared/ui/textarea";
+import { Label } from "@/shared/ui/label";
+import { Input } from "@/shared/ui/input";
+import { Card, CardContent } from "@/shared/ui/card";
 import Link from "next/link";
 import { toast } from "sonner"; // Добавляем toast для красоты
 

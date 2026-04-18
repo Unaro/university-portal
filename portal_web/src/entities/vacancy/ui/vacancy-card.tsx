@@ -1,9 +1,9 @@
 // src/entities/vacancy/ui/vacancy-card.tsx
 import Link from "next/link";
 import { Building2, Clock, MapPin } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Card, CardContent } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
 import { vacancies, organizations, skills } from "@/db/schema"; 
 
 // Уточняем тип: теперь мы ждем массив requiredSkills с вложенным skill

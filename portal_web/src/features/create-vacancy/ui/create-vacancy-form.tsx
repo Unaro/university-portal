@@ -3,13 +3,13 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { createVacancy, CreateVacancyState } from "@/app/actions/vacancy";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MultiSelect, Option } from "@/components/ui/multi-select";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Label } from "@/shared/ui/label";
+import { Textarea } from "@/shared/ui/textarea";
+import { Card, CardContent } from "@/shared/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
+import { MultiSelect, Option } from "@/shared/ui/multi-select";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Major } from "@/shared/types/db";

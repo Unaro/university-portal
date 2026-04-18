@@ -1,6 +1,6 @@
 // src/views/auth/ui/register-view.tsx
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/shared/ui/card";
 import { RegisterForm } from "@/features/auth/ui/register-form";
 
 export function RegisterView() {

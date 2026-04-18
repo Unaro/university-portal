@@ -1,6 +1,6 @@
 // src/views/auth/ui/login-view.tsx
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/shared/ui/card";
 import { LoginForm } from "@/features/auth/ui/login-form";
 
 export function LoginView() {

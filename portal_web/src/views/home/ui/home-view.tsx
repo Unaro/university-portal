@@ -1,6 +1,6 @@
 // src/views/home/ui/home-view.tsx
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Hero } from "@/widgets/landing/ui/hero";
 import { Features } from "@/widgets/landing/ui/features";

@@ -5,7 +5,7 @@ import { eq, desc, inArray } from "drizzle-orm";
 import { ApplicationCard } from "@/entities/application/ui/application-card";
 import { ApplicationResponseForm } from "@/features/manage-application/ui/application-response-form";
 import { getFileUrl } from "@/lib/s3";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { CheckCircle2, XCircle, Clock, Briefcase } from "lucide-react";
 import Link from "next/link";
 

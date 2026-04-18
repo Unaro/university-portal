@@ -4,11 +4,12 @@ import { db } from "@/db";
 import { majors, skills } from "@/db/schema";
 import { redirect } from "next/navigation";
 import { VacancyCreateView } from "@/views/vacancy-create/ui/vacancy-create-view";
-import { Option } from "@/components/ui/multi-select";
+import { Option } from "@/shared/ui/multi-select";
 
 export default async function CreateVacancyPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
+  if (session.user.role !== "organization_representative") redirect("/login");
 
   // 1. Получаем типизированные данные из БД
   const allMajors = await db.select().from(majors);

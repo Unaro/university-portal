@@ -1,7 +1,7 @@
 // src/auth.ts
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { authConfig } from "../auth.config"; // Убедись, что этот файл существует и корректен
+import { authConfig } from "../auth.config";
 import { z } from "zod";
 import { db } from "./db";
 import { users } from "./db/schema";
@@ -37,8 +37,6 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
 
           const passwordsMatch = await verifyPassword(password, user.password);
           if (passwordsMatch) {
-             // Возвращаем объект пользователя. 
-             // Важно: поля должны совпадать с теми, что ожидает jwt callback в auth.config.ts
              return { 
                id: user.id.toString(),
                name: user.name,

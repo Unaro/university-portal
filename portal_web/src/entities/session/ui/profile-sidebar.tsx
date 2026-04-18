@@ -1,7 +1,7 @@
 // src/entities/session/ui/profile-sidebar.tsx
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
+import { Badge } from "@/shared/ui/badge";
+import { Card, CardContent } from "@/shared/ui/card";
 import { Mail, Phone, GraduationCap, Building2 } from "lucide-react";
 import { LogoutButton } from "@/features/auth/ui/logout-button";
 import type { SessionUser } from "@/views/profile/ui/profile-view";

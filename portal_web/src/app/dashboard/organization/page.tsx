@@ -9,6 +9,7 @@ import { OrgSettingsView } from "@/views/organization-settings/ui/org-settings-v
 export default async function OrgSettingsPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
+  if (session.user.role !== "organization_representative") redirect("/login");
 
   const rep = await db.query.organizationRepresentatives.findFirst({
     where: eq(organizationRepresentatives.userId, parseInt(session.user.id)),

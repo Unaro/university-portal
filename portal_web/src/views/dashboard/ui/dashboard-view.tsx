@@ -1,18 +1,12 @@
 // src/views/dashboard/ui/dashboard-view.tsx
-import { auth, signOut } from "@/auth";
-import { Button } from "@/components/ui/button";
+import { auth } from "@/auth";
+import { Button } from "@/shared/ui/button";
 import { redirect } from "next/navigation";
 import { StudentDashboard } from "./student-dashboard";
 import { PartnerDashboard } from "./partner-dashboard";
 import Link from "next/link";
 
-interface DashboardViewProps {
-  searchParams?: {
-    filter?: string;
-  };
-}
-
-export async function DashboardView({ searchParams }: DashboardViewProps) {
+export async function DashboardView() {
   const session = await auth();
   
   if (!session?.user?.id) redirect("/login");
@@ -20,16 +14,23 @@ export async function DashboardView({ searchParams }: DashboardViewProps) {
   const userRole = session.user.role;
   const userId = parseInt(session.user.id);
 
+
+  const textRoleConfig = {
+    student: "Студент",
+    organization_representative: "Партнер",
+    university_staff: "Сотрудник ВУЗа",
+    admin: "Администратор",
+  }
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl min-h-screen">
       {/* ОБЩИЙ HEADER СТРАНИЦЫ */}
-      <div className="flex flex-col md:flex-row justify-between items-end gap-4 mb-8">
+      <div className="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-8">
         <div>
            <h1 className="text-3xl font-bold text-foreground">Личный кабинет</h1>
            <p className="text-muted-foreground mt-1">
               Роль: <span className="font-medium text-foreground">
-                {userRole === 'organization_representative' ? 'Партнер' :
-                 userRole === 'student' ? 'Студент' : 'Сотрудник ВУЗа'}
+                {textRoleConfig[userRole] || 'Неизвестная роль'}
               </span>
            </p>
         </div>

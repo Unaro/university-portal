@@ -3,12 +3,12 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Input } from "@/shared/ui/input";
+import { Button } from "@/shared/ui/button";
+import { Checkbox } from "@/shared/ui/checkbox";
+import { Label } from "@/shared/ui/label";
+import { Card } from "@/shared/ui/card";
+import { Separator } from "@/shared/ui/separator";
 import { Search, Filter } from "lucide-react";
 
 export function VacancyFilter() {

@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { LogIn, UserPlus, LayoutDashboard, User } from "lucide-react";
 // Импортируем нашу новую фичу
 import { LogoutDropdownItem } from "@/features/auth/ui/logout-dropdown-item"; 
@@ -14,22 +14,32 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+} from "@/shared/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
+import type { users } from "@/db/schema";
 
 interface HeaderClientProps {
   isLoggedIn: boolean;
-  userRole?: string;
+  userRole?: typeof users.$inferSelect["role"];
   userName?: string | null;
   userImage?: string | null;
   userEmail?: string | null;
   themeToggle: React.ReactNode;
 }
 
+
+//Подумать над тем, чтобы вынести эту конфигурацию в отдельный файл, если она будет использоваться в нескольких местах приложения. Этот же конфиг есть в dashboard-view.
+const textRoleConfig = {
+  student: "Студент",
+  organization_representative: "Партнер",
+  university_staff: "Сотрудник ВУЗа",
+  admin: "Администратор",
+}
+
 export function HeaderClient({ isLoggedIn, userRole, userName, userImage, userEmail, themeToggle }: HeaderClientProps) {
   const getInitials = (name?: string | null) =>
     name ? name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) : "??";
-
+  
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-primary text-primary-foreground shadow-md">
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
@@ -71,13 +81,23 @@ export function HeaderClient({ isLoggedIn, userRole, userName, userImage, userEm
                     <p className="text-sm font-medium leading-none">{userName}</p>
                     <p className="text-xs leading-none text-muted-foreground">{userEmail}</p>
                     <p className="text-xs font-bold text-primary mt-1 uppercase">
-                      {userRole === 'organization_representative' ? 'Партнер' :
-                       userRole === 'university_staff' ? 'Администратор' : 'Студент'}
+                      {userRole ? textRoleConfig[userRole] : 'Неизвестная роль'}
                     </p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-
+                <DropdownMenuItem asChild>
+                  <Link className="lg:hidden cursor-pointer" href="/">Главная</Link> 
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link className="lg:hidden"  href="/practices">Практики</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link className="lg:hidden"  href="/organizations">Организации</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link className="lg:hidden"  href="/documents">Документы</Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href={userRole === 'student' ? "/profile" : "/dashboard"} className="cursor-pointer">
                     {userRole === 'student' ? <User className="mr-2 h-4 w-4" /> : <LayoutDashboard className="mr-2 h-4 w-4" />}

@@ -3,9 +3,9 @@
 
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/shared/ui/input";
 import { Search, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 
 export function OrganizationSearch() {
   const searchParams = useSearchParams();
