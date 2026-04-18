@@ -13,7 +13,6 @@ export async function Header() {
       userName={session?.user?.name}
       userImage={session?.user?.image}
       userEmail={session?.user?.email}
-      themeToggle={<ThemeToggle />}
     />
   );
 }

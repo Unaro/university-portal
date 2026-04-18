@@ -9,6 +9,7 @@ import { verifyOrganization } from "@/app/actions/admin";
 import { getFileUrl } from "@/lib/s3";
 import { getAdminStats } from "@/app/actions/stats";
 import Image from "next/image";
+import { StatsCard } from "@/shared/ui";
 
 export async function AdminView() {
   const stats = await getAdminStats();
@@ -40,29 +41,12 @@ export async function AdminView() {
         </Link>
       </div>
 
-      {/* <div className="mb-6 flex gap-4">
-      </div> */}
-
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-          <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Студентов</CardTitle></CardHeader>
-            <CardContent><div className="text-2xl font-bold">{stats.totalStudents}</div></CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Компаний</CardTitle></CardHeader>
-            <CardContent><div className="text-2xl font-bold">{stats.totalCompanies}</div></CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-sm text-muted-foreground">Заявок</CardTitle></CardHeader>
-            <CardContent><div className="text-2xl font-bold">{stats.totalApplications}</div></CardContent>
-          </Card>
-          <Card className="bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800">
-            <CardHeader className="pb-2"><CardTitle className="text-sm text-green-700 dark:text-green-400">Трудоустроено</CardTitle></CardHeader>
-            <CardContent>
-                <div className="text-2xl font-bold text-green-700 dark:text-green-400">{stats.successfulHires}</div>
-            </CardContent>
-          </Card>
+          <StatsCard variant="mini" label="Студентов" value={stats.totalStudents}/>
+          <StatsCard variant="mini" label="Компаний" value={stats.totalCompanies}/>
+          <StatsCard variant="mini" label="Заявок" value={stats.totalApplications}/>
+          <StatsCard variant="mini" color="text-green-700 dark:text-green-400" className="bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800" label="Трудоустроено" value={stats.successfulHires}/>
         </div>
       )}
 
@@ -75,7 +59,7 @@ export async function AdminView() {
         ) : (
           <div className="grid gap-6">
             {orgsWithLogos.map((org) => (
-               <Card key={org.id} className="overflow-hidden">
+               <Card key={org.id}>
                   <CardHeader className="bg-muted border-b pb-4">
                       <div className="flex justify-between items-start">
                         <div>

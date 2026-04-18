@@ -21,14 +21,14 @@ export function ThemeToggle() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative h-10 w-10 rounded-full text-primary-foreground hover:bg-primary-foreground/20 hover:text-primary-foreground"
+          className="h-10 w-10 rounded-full text-foreground hover:bg-accent hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring"
         >
           <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
           <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
           <span className="sr-only">Переключить тему</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="bg-background border-border">
         <DropdownMenuItem onClick={() => setTheme("light")}>
           Светлая
         </DropdownMenuItem>
