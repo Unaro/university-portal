@@ -61,12 +61,19 @@ describe("Application Processing Flow", () => {
       user: { id: "1", role: "student" },
     });
 
-    vi.mocked(db.query.students.findFirst).mockResolvedValue({ id: 1 });
+    vi.mocked(db.query.students.findFirst).mockResolvedValue({ 
+      id: 1, 
+      course: 3, 
+      majorId: 1 
+    });
     vi.mocked(db.query.vacancies.findFirst).mockResolvedValue({
       id: 1,
       title: "Разработчик ПО",
       isActive: true,
       organizationId: 1,
+      organization: { verificationStatus: "approved" },
+      allowedMajors: [],
+      applications: [],
     });
     vi.mocked(db.query.applications.findFirst).mockResolvedValue(null);
 
@@ -110,12 +117,19 @@ describe("Application Processing Flow", () => {
       user: { id: "1", role: "student" },
     });
 
-    vi.mocked(db.query.students.findFirst).mockResolvedValue({ id: 1 });
+    vi.mocked(db.query.students.findFirst).mockResolvedValue({ 
+      id: 1, 
+      course: 3, 
+      majorId: 1 
+    });
     vi.mocked(db.query.vacancies.findFirst).mockResolvedValue({
       id: 1,
       title: "Разработчик ПО",
       isActive: true,
       organizationId: 1,
+      organization: { verificationStatus: "approved" },
+      allowedMajors: [],
+      applications: [],
     });
     vi.mocked(db.query.applications.findFirst).mockResolvedValue(null);
 
@@ -158,12 +172,19 @@ describe("Application Processing Flow", () => {
       user: { id: "1", role: "student" },
     });
 
-    vi.mocked(db.query.students.findFirst).mockResolvedValue({ id: 1 });
+    vi.mocked(db.query.students.findFirst).mockResolvedValue({ 
+      id: 1, 
+      course: 3, 
+      majorId: 1 
+    });
     vi.mocked(db.query.vacancies.findFirst).mockResolvedValue({
       id: 1,
       title: "Разработчик ПО",
       isActive: true,
       organizationId: 1, // Организация A
+      organization: { verificationStatus: "approved" },
+      allowedMajors: [],
+      applications: [],
     });
     vi.mocked(db.query.applications.findFirst).mockResolvedValue(null);
 

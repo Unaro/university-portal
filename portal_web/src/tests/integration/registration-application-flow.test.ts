@@ -107,7 +107,11 @@ describe("Registration → Application Flow", () => {
     // ============================================
     // STEP 3: Проверка профиля студента
     // ============================================
-    vi.mocked(db.query.students.findFirst).mockResolvedValue({ id: 1 });
+    vi.mocked(db.query.students.findFirst).mockResolvedValue({ 
+      id: 1, 
+      course: 3, 
+      majorId: 1 
+    });
 
     // ============================================
     // STEP 4: Просмотр вакансии
@@ -116,6 +120,10 @@ describe("Registration → Application Flow", () => {
       id: 1,
       title: "Разработчик ПО",
       isActive: true,
+      organizationId: 1,
+      organization: { verificationStatus: "approved" },
+      allowedMajors: [],
+      applications: [],
     });
 
     // ============================================
@@ -175,7 +183,11 @@ describe("Registration → Application Flow", () => {
     // ============================================
     // STEP 2: Профиль студента существует
     // ============================================
-    vi.mocked(db.query.students.findFirst).mockResolvedValue({ id: 1 });
+    vi.mocked(db.query.students.findFirst).mockResolvedValue({ 
+      id: 1, 
+      course: 3, 
+      majorId: 1 
+    });
 
     // ============================================
     // STEP 3: Вакансия неактивна
@@ -184,6 +196,9 @@ describe("Registration → Application Flow", () => {
       id: 1,
       title: "Разработчик ПО",
       isActive: false,
+      organization: { verificationStatus: "approved" },
+      allowedMajors: [],
+      applications: [],
     });
 
     // ============================================
@@ -196,7 +211,7 @@ describe("Registration → Application Flow", () => {
     // ============================================
     expect(result.success).toBe(false);
     expect(result.code).toBe("NOT_FOUND");
-    expect(result.message).toBe("Вакансия не найдена или неактивна.");
+    expect(result.message).toBe("Вакансия не найдена, неактивна или организация не подтверждена.");
   });
 
   it("должен предотвращать дублирование отклика", async () => {
@@ -210,7 +225,11 @@ describe("Registration → Application Flow", () => {
     // ============================================
     // STEP 2: Профиль студента существует
     // ============================================
-    vi.mocked(db.query.students.findFirst).mockResolvedValue({ id: 1 });
+    vi.mocked(db.query.students.findFirst).mockResolvedValue({ 
+      id: 1, 
+      course: 3, 
+      majorId: 1 
+    });
 
     // ============================================
     // STEP 3: Вакансия активна
@@ -219,6 +238,9 @@ describe("Registration → Application Flow", () => {
       id: 1,
       title: "Разработчик ПО",
       isActive: true,
+      organization: { verificationStatus: "approved" },
+      allowedMajors: [],
+      applications: [],
     });
 
     // ============================================
