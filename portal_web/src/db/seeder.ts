@@ -41,6 +41,12 @@ import {
 } from "./seed-data";
 import { S3Client, CreateBucketCommand, PutObjectCommand, DeleteObjectsCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 
+
+if (process.env.NODE_ENV === 'production' && !process.env.ALLOW_SEED_IN_PROD) {
+  console.error("seeding is disabled in production. Set ALLOW_SEED_IN_PROD=1 to override.");
+  process.exit(1);
+}
+
 // ==================== MINIO CLIENT ====================
 
 const BUCKET_NAME = process.env.S3_BUCKET_NAME || "portal-documents";
@@ -237,6 +243,8 @@ async function seedDatabase() {
       group: s.group,
       course: s.course,
       majorId: insertedMajors[s.majorIndex]?.id,
+      currentPracticeType: s.currentPracticeType,
+      projectTheme: s.projectTheme,
     })))
     .onConflictDoNothing()
     .returning();
@@ -293,7 +301,10 @@ async function seedDatabase() {
       type: v.type,
       salary: v.salary,
       minCourse: v.minCourse,
-    })))
+      availableSpots: (v as { availableSpots?: number }).availableSpots || null,
+      startDate: v.startDate || null,
+      endDate: v.endDate || null,
+      })))
     .onConflictDoNothing()
     .returning();
   console.log(`  ✓ ${insertedVacancies.length} vacancies`);
@@ -318,13 +329,20 @@ async function seedDatabase() {
   
   // 13. Applications
   await db.insert(applications).values(
-    APPLICATIONS.map(a => ({
-      studentId: insertedStudents[a.studentIndex]!.id!,
-      vacancyId: insertedVacancies[a.vacancyIndex]!.id!,
-      status: a.status,
-      coverLetter: a.coverLetter,
-      responseMessage: a.responseMessage,
-    }))
+    APPLICATIONS.map(a => {
+      const vacancy = insertedVacancies[a.vacancyIndex]!;
+      const student = STUDENTS[a.studentIndex]!;
+      return {
+        studentId: insertedStudents[a.studentIndex]!.id!,
+        vacancyId: vacancy.id!,
+        status: a.status as "pending" | "approved" | "rejected",
+        universityApprovalStatus: (vacancy.type === "practice" ? (a.status === "pending" ? "pending" : "approved") : "not_required") as "pending" | "approved" | "not_required" | "rejected",
+        practiceType: (vacancy.type === "practice" ? (a.practiceType || student.currentPracticeType) : null) as "educational" | "production" | "pre_diploma" | null,
+        projectTheme: (vacancy.type === "practice" ? (a.projectTheme || student.projectTheme) : null) as string | null,
+        coverLetter: a.coverLetter,
+        responseMessage: a.responseMessage,
+      };
+    })
   ).onConflictDoNothing();
   console.log(`  ✓ ${APPLICATIONS.length} applications`);
   

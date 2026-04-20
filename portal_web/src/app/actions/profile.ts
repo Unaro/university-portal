@@ -28,6 +28,8 @@ export async function updateStudentProfile(
   const group = formData.get("group") as string;
   const majorId = parseInt(formData.get("majorId") as string);
   const course = parseInt(formData.get("course") as string);
+  const currentPracticeType = formData.get("currentPracticeType") as "educational" | "production" | "pre_diploma" | null;
+  const projectTheme = formData.get("projectTheme") as string | null;
   
   // Навыки приходят как JSON-строка (ID навыков), так как FormData плохо работает с массивами напрямую из JS-компонентов
   const skillsJson = formData.get("skills") as string; 
@@ -53,6 +55,8 @@ export async function updateStudentProfile(
           group,
           majorId,
           course,
+          ...(currentPracticeType ? { currentPracticeType } : {}),
+          projectTheme,
         })
         .where(eq(students.id, student.id));
 

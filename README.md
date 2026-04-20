@@ -454,26 +454,25 @@ university-portal/
 // Роли пользователей
 type Role = "student" | "university_staff" | "organization_representative" | "admin";
 
-// Статус модерации
-type ModerationStatus = "pending" | "approved" | "rejected";
+// Статус модерации ВУЗом (для заявок на практику)
+type UnivApprovalStatus = "not_required" | "pending" | "approved" | "rejected";
 
-// Статус заявки
+// Тип практики студента
+type StudentPracticeType = "educational" | "production" | "pre_diploma";
+
+// Статус отклика (со стороны компании)
 type ApplicationStatus = "pending" | "approved" | "rejected";
-
-// Тип практики
-type InternshipType = "practice" | "internship" | "job";
-
-// Категория материала
-type MaterialCategory = "regulatory" | "template" | "material";
 ```
 
 ### Миграции
 
+В проекте настроена автоматическая синхронизация схемы при старте контейнера. Для ручного управления:
+
 ```bash
-# Применить миграции
+# Применить миграции вручную
 pnpm run db:push
 
-# Просмотр миграций (drizzle-kit)
+# Просмотр базы через GUI (drizzle-kit)
 npx drizzle-kit studio
 ```
 

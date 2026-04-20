@@ -4,11 +4,11 @@
 import { useActionState, useEffect } from "react";
 import { registerUser } from "@/app/actions/register"; // Студент
 import { registerPartner } from "@/app/actions/register-partner"; // Партнер
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Label } from "@/shared/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { Checkbox } from "@/shared/ui/checkbox";
 import { Building2, GraduationCap, User } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -114,11 +114,11 @@ function PartnerRegisterForm() {
 export function RegisterForm() {
   return (
     <Tabs defaultValue="student" className="w-full">
-      <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-slate-100 mb-8">
-        <TabsTrigger value="student" className="py-3 gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all">
+      <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted mb-8">
+        <TabsTrigger value="student" className="py-3 gap-2 data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all">
           <GraduationCap className="h-4 w-4" /> Студент
         </TabsTrigger>
-        <TabsTrigger value="partner" className="py-3 gap-2 data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all">
+        <TabsTrigger value="partner" className="py-3 gap-2 data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all">
           <Building2 className="h-4 w-4" /> Партнер
         </TabsTrigger>
         <TabsTrigger value="staff" disabled className="py-3 gap-2 opacity-50 cursor-not-allowed">

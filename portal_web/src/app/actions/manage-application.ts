@@ -42,7 +42,7 @@ export async function processApplication(
   const application = await db.query.applications.findFirst({
     where: eq(applications.id, applicationId),
     with: {
-      vacancy: true, // Подгружаем вакансию
+      vacancy: true,
     },
   });
 
@@ -55,6 +55,11 @@ export async function processApplication(
     return { success: false, message: "Вы не можете управлять заявками чужой организации." };
   }
 
+  // 3.5 Проверка комментария при отказе
+  if (newStatus === "rejected" && (!responseMessage || responseMessage.trim().length === 0)) {
+    return { success: false, message: "При отказе необходимо указать причину." };
+  }
+
   try {
     // 4. Обновляем статус и сообщение
     await db
@@ -65,7 +70,9 @@ export async function processApplication(
       })
       .where(eq(applications.id, applicationId));
 
-    revalidatePath("/dashboard/applications"); // Обновим страницу заявок (создадим её далее)
+    revalidatePath("/dashboard/applications"); 
+    revalidatePath("/practices");
+    revalidatePath("/");
     return { success: true, message: "Статус заявки успешно обновлен." };
   } catch (error) {
     console.error("Error processing application:", error);

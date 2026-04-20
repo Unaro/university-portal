@@ -22,6 +22,9 @@ const createVacancySchema = z.object({
   // Новые поля
   salary: z.string().optional(),
   minCourse: z.coerce.number().min(1).max(6),
+  availableSpots: z.preprocess((val) => (val === "" ? null : val), z.coerce.number().min(1, "Должно быть минимум 1 место").optional().nullable()),
+  startDate: z.preprocess((val) => (val === "" ? null : val), z.coerce.date().optional().nullable()),
+  endDate: z.preprocess((val) => (val === "" ? null : val), z.coerce.date().optional().nullable()),
   type: z.enum(["practice", "internship", "job"]),
   // Массивы ID для связей
   skillIds: z.array(z.number()),
@@ -60,6 +63,9 @@ export async function createVacancy(
     requirements: formData.get("requirements"),
     salary: formData.get("salary"),
     minCourse: formData.get("minCourse"),
+    availableSpots: formData.get("availableSpots") ? formData.get("availableSpots") : null,
+    startDate: formData.get("startDate") ? formData.get("startDate") : null,
+    endDate: formData.get("endDate") ? formData.get("endDate") : null,
     type: formData.get("type"),
     skillIds: rawSkills ? JSON.parse(rawSkills).map(Number) : [],
     majorIds: rawMajors ? JSON.parse(rawMajors).map(Number) : [],
@@ -67,15 +73,16 @@ export async function createVacancy(
 
   // 3. Валидация
   const validated = createVacancySchema.safeParse(rawData);
+
   if (!validated.success) {
-    return { 
-      success: false, 
-      message: "Ошибка валидации", 
-      errors: validated.error.flatten().fieldErrors 
+    return {
+      success: false,
+      message: "Ошибка валидации. Проверьте введенные данные.",
+      errors: validated.error.flatten().fieldErrors,
     };
   }
 
-  const data = validated.data;
+  const { data } = validated;
 
   try {
     // 4. ТРАНЗАКЦИЯ: Создаем вакансию и связи
@@ -88,6 +95,9 @@ export async function createVacancy(
         organizationId: representative.organizationId,
         salary: data.salary || null,
         minCourse: data.minCourse,
+        availableSpots: data.availableSpots || null,
+        startDate: data.startDate || null,
+        endDate: data.endDate || null,
         type: data.type,
       }).returning();
 
@@ -112,13 +122,13 @@ export async function createVacancy(
       }
     });
 
+    revalidatePath("/practices");
+    revalidatePath("/dashboard");
+    return { success: true, message: "Вакансия успешно создана!" };
   } catch (error) {
     console.error("Create vacancy error:", error);
-    return { success: false, message: "Ошибка базы данных" };
+    return { success: false, message: "Ошибка при сохранении в базу данных." };
   }
-
-  revalidatePath("/dashboard");
-  redirect("/dashboard");
 }
 
 export async function deleteVacancy(vacancyId: number) {
@@ -149,5 +159,36 @@ export async function deleteVacancy(vacancyId: number) {
   } catch (error) {
     console.error("Delete vacancy error:", error);
     return { success: false, message: "Ошибка при удалении" };
+  }
+}
+
+export async function toggleVacancyStatus(vacancyId: number) {
+  const session = await auth();
+  if (!session?.user) return { success: false, message: "Не авторизован" };
+
+  try {
+    const rep = await db.query.organizationRepresentatives.findFirst({
+      where: eq(organizationRepresentatives.userId, parseInt(session.user.id)),
+    });
+
+    if (!rep) return { success: false, message: "Вы не представитель организации" };
+
+    const vacancy = await db.query.vacancies.findFirst({
+      where: eq(vacancies.id, vacancyId),
+    });
+
+    if (!vacancy || vacancy.organizationId !== rep.organizationId) {
+      return { success: false, message: "Вакансия не найдена или нет прав" };
+    }
+
+    await db.update(vacancies)
+      .set({ isActive: !vacancy.isActive })
+      .where(eq(vacancies.id, vacancyId));
+
+    revalidatePath("/dashboard");
+    return { success: true, message: vacancy.isActive ? "Вакансия скрыта" : "Вакансия опубликована" };
+  } catch (error) {
+    console.error("Toggle vacancy status error:", error);
+    return { success: false, message: "Ошибка при обновлении статуса" };
   }
 }

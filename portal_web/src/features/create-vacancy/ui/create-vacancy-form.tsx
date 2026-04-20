@@ -3,13 +3,13 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { createVacancy, CreateVacancyState } from "@/app/actions/vacancy";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { MultiSelect, Option } from "@/components/ui/multi-select";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Label } from "@/shared/ui/label";
+import { Textarea } from "@/shared/ui/textarea";
+import { Card, CardContent } from "@/shared/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
+import { MultiSelect, Option } from "@/shared/ui/multi-select";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Major } from "@/shared/types/db";
@@ -54,7 +54,7 @@ export function CreateVacancyForm({ allMajors, allSkills }: CreateVacancyFormPro
           <div className="space-y-2">
             <Label htmlFor="title">Название позиции *</Label>
             <Input id="title" name="title" placeholder="Java Developer / Стажер" required />
-            {state.errors?.title && <p className="text-red-500 text-sm">{state.errors.title}</p>}
+            {state.errors?.title && <p className="text-destructive text-sm">{state.errors.title}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -80,20 +80,39 @@ export function CreateVacancyForm({ allMajors, allSkills }: CreateVacancyFormPro
           </div>
 
           {/* Фильтры студентов */}
-          <div className="p-4 bg-slate-50 rounded-lg border space-y-4">
-            <h3 className="font-semibold text-sm text-slate-700">Требования к кандидату</h3>
+          <div className="p-4 bg-muted rounded-lg border space-y-4">
+            <h3 className="font-semibold text-sm text-muted-foreground">Требования и квоты</h3>
             
-            <div className="space-y-2">
-               <Label>Минимальный курс</Label>
-               <input type="hidden" name="minCourse" value={minCourse} />
-               <Select value={minCourse} onValueChange={setMinCourse}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                     {[1, 2, 3, 4, 5, 6].map(c => (
-                        <SelectItem key={c} value={c.toString()}>{c} курс и старше</SelectItem>
-                     ))}
-                  </SelectContent>
-               </Select>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Минимальный курс</Label>
+                <input type="hidden" name="minCourse" value={minCourse} />
+                <Select value={minCourse} onValueChange={setMinCourse}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {[1, 2, 3, 4, 5, 6].map(c => (
+                          <SelectItem key={c} value={c.toString()}>{c} курс и старше</SelectItem>
+                      ))}
+                    </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="availableSpots">Количество мест (опционально)</Label>
+                <Input id="availableSpots" name="availableSpots" type="number" min="1" placeholder="Например, 4" />
+                {state.errors?.availableSpots && <p className="text-destructive text-sm">{state.errors.availableSpots}</p>}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="startDate">Дата начала</Label>
+                <Input id="startDate" name="startDate" type="date" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="endDate">Дата окончания</Label>
+                <Input id="endDate" name="endDate" type="date" />
+              </div>
             </div>
 
             <div className="space-y-2">

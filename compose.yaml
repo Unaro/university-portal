@@ -11,17 +11,16 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      # Позволяем переопределить порт на хосте, если 5432 уже занят (например, другой локальной БД)
-      # Синтаксис ${VAR:-default} означает: "использовать VAR, но если её нет, взять default"
       - "${DB_PORT_HOST:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      # Динамически подставляем юзера и имя базы в проверку здоровья
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - app_net
 
   # 2. S3 (MinIO)
   minio:
@@ -36,11 +35,13 @@ services:
       - "${MINIO_CONSOLE_PORT:-9001}:9001"
     volumes:
       - minio_data:/data
+    networks:
+      - app_net
 
   # 3. НАШ САЙТ (Next.js)
   web:
     build:
-      context: portal_web # Указываем папку сборки явно
+      context: portal_web
       args:
         NEXT_PUBLIC_S3_ENDPOINT: ${S3_PUBLIC_ENDPOINT}
     container_name: portal-web
@@ -56,15 +57,20 @@ services:
       - .env
     environment:
       - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+    networks:
+      - app_net
+
 
   # 4. SEEDER (заполняет БД и MinIO)
   seeder:
     build:
       context: portal_web
-      target: seeder # Используем стадию seeder
+      target: runner
       args:
         NEXT_PUBLIC_S3_ENDPOINT: ${S3_PUBLIC_ENDPOINT}
     container_name: portal-seeder
+    restart: "no" 
+    profiles: ["dev"] 
     depends_on:
       db:
         condition: service_healthy
@@ -75,9 +81,17 @@ services:
     environment:
       - DATABASE_URL=postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
       - S3_ENDPOINT=http://minio:9000
-    entrypoint: ["sh", "-c", "npx drizzle-kit push && npx tsx src/db/seeder.ts"]
+      - CLEAR_DB=${CLEAR_DB:-true}
+      - CLEAR_MINIO=${CLEAR_MINIO:-true}
+      - ALLOW_SEED_IN_PROD=1
+    entrypoint: ["sh", "-c", "npx drizzle-kit push --force && npx tsx src/db/seeder.ts"]
+    networks:
+      - app_net
 
 volumes:
-  # Можно оставить пустыми, Docker сам создаст default тома
   postgres_data:
   minio_data:
+
+networks:
+  app_net:
+    driver: bridge

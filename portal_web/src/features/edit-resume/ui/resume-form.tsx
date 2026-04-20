@@ -3,11 +3,11 @@
 
 import { useActionState, useEffect } from "react";
 import { saveResume, ResumeActionState } from "@/app/actions/resume";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button, BackButton } from "@/shared/ui";
+import { Textarea } from "@/shared/ui/textarea";
+import { Label } from "@/shared/ui/label";
+import { Input } from "@/shared/ui/input";
+import { Card, CardContent } from "@/shared/ui/card";
 import Link from "next/link";
 import { toast } from "sonner"; // Добавляем toast для красоты
 
@@ -63,7 +63,7 @@ export function ResumeForm({
             <Label htmlFor="file">Файл резюме (PDF)</Label>
             <Input id="file" name="file" type="file" accept="application/pdf" />
             {existingFile && (
-              <p className="text-sm text-green-600 mt-1 flex items-center gap-1">
+              <p className="text-sm text-green-600 dark:text-green-400 mt-1 flex items-center gap-1">
                 <span>📄</span> Файл уже загружен. Загрузите новый, чтобы заменить.
               </p>
             )}
@@ -73,9 +73,7 @@ export function ResumeForm({
             <Button type="submit" disabled={isPending}>
               {isPending ? "Сохранение..." : "Сохранить резюме"}
             </Button>
-            <Link href="/dashboard">
-              <Button variant="outline" type="button">Назад</Button>
-            </Link>
+            <BackButton variant="outline" label="Назад" type="button" />
           </div>
           
         </form>

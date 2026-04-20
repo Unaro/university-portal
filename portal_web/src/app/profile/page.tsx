@@ -10,11 +10,10 @@ import { getFileUrl } from "@/lib/s3";
 
 export default async function ProfilePage() {
   const session = await auth();
-  
+
   if (!session?.user) redirect("/login");
-  
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const user = session.user as any; 
+
+  const user = session.user;
 
   if (user.role !== "student") {
      redirect("/dashboard");
@@ -62,7 +61,6 @@ export default async function ProfilePage() {
   return (
     <ProfileView 
        user={user}
-       // Теперь studentData соответствует типу StudentWithSkills
        studentData={studentData || null}
        resumeData={resumeData}
        majors={allMajors}

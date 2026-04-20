@@ -54,7 +54,7 @@ export async function createOrganization(prevState: State, formData: FormData) {
     let logoKey: string | null = null;
     if (logo && logo.size > 0) {
       console.log("Uploading logo to MinIO...");
-      logoKey = await uploadFile(logo, "logos");
+      logoKey = await uploadFile(logo as File, "logos");
     }
 
     // 5. Транзакция в БД (Создаем организацию + Привязываем представителя)

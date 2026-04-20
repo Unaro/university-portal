@@ -34,10 +34,35 @@ export async function applyToVacancy(vacancyId: number): Promise<ActionResponse>
   // Проверка существования вакансии
   const vacancy = await db.query.vacancies.findFirst({
     where: eq(vacancies.id, vacancyId),
+    with: { 
+      organization: true,
+      allowedMajors: true, // <--- НОВОЕ
+      applications: {
+        where: eq(applications.status, "approved"),
+        columns: { id: true }
+      }
+    },
   });
 
-  if (!vacancy || !vacancy.isActive) {
-    return { success: false, message: "Вакансия не найдена или неактивна.", code: "NOT_FOUND" };
+  if (!vacancy || !vacancy.isActive || vacancy.organization.verificationStatus !== "approved") {
+    return { success: false, message: "Вакансия не найдена, неактивна или организация не подтверждена.", code: "NOT_FOUND" };
+  }
+
+  // --- ПРОВЕРКА ОГРАНИЧЕНИЙ (НОВОЕ) ---
+  const courseMatch = (studentProfile.course ?? 0) >= (vacancy.minCourse ?? 1);
+  const allowedMajorIds = vacancy.allowedMajors.map(m => m.majorId);
+  const majorMatch = allowedMajorIds.length === 0 || (studentProfile.majorId && allowedMajorIds.includes(studentProfile.majorId));
+
+  if (!courseMatch) {
+    return { success: false, message: `Для данной позиции требуется курс не ниже ${vacancy.minCourse}.`, code: "FORBIDDEN" };
+  }
+  if (!majorMatch) {
+    return { success: false, message: "Ваша специальность не входит в список разрешенных для данной вакансии.", code: "FORBIDDEN" };
+  }
+
+  // Проверка лимита мест
+  if (vacancy.availableSpots && vacancy.applications.length >= vacancy.availableSpots) {
+    return { success: false, message: "Набор на данную вакансию уже закрыт (места закончились).", code: "FORBIDDEN" };
   }
 
   // Проверка дубликатов (уже откликался?)
@@ -58,6 +83,9 @@ export async function applyToVacancy(vacancyId: number): Promise<ActionResponse>
       studentId: studentProfile.id,
       vacancyId: vacancyId,
       status: "pending",
+      universityApprovalStatus: vacancy.type === "practice" ? "pending" : "not_required",
+      practiceType: vacancy.type === "practice" ? studentProfile.currentPracticeType : null,
+      projectTheme: vacancy.type === "practice" ? studentProfile.projectTheme : null,
     });
 
     revalidatePath("/dashboard");

@@ -18,22 +18,31 @@ export default async function PracticeDetailsPage({ params }: PageProps) {
 
   if (isNaN(vacancyId)) notFound();
 
-  // 1. Загружаем вакансию с организацией и навыками
+  // 1. Загружаем вакансию с организацией, навыками и разрешенными специальностями
   const vacancy = await db.query.vacancies.findFirst({
     where: eq(vacancies.id, vacancyId),
     with: {
       organization: true,
       requiredSkills: {
         with: { skill: true }
+      },
+      allowedMajors: true, // <--- НОВОЕ
+      applications: {
+        where: eq(applications.status, "approved"),
+        columns: { id: true }
       }
     }
   });
 
-  if (!vacancy) notFound();
+  if (!vacancy || vacancy.organization.verificationStatus !== "approved" || (!vacancy.isActive && session?.user?.role !== "admin")) notFound();
 
-  // 2. Проверяем статус отклика и возможность откликнуться
+  const isFull = vacancy.availableSpots ? vacancy.applications.length >= vacancy.availableSpots : false;
+
+  // 2. Проверяем статус отклика и возможность откликнуться, а так же залогинен ли сам пользователь
   let isApplied = false;
   let canApply = false;
+  let isLoggined = false;
+  let errorReason = ""; // <--- НОВОЕ
 
   if (session?.user?.id && session.user.role === "student") {
     const studentId = parseInt(session.user.id);
@@ -54,9 +63,23 @@ export default async function PracticeDetailsPage({ params }: PageProps) {
       });
       
       isApplied = !!application;
+      isLoggined = true;
+
+      // --- ПРОВЕРКА УСЛОВИЙ (НОВОЕ) ---
+      const hasSkills = studentProfile.skills.length > 0;
+      const courseMatch = (studentProfile.course ?? 0) >= (vacancy.minCourse ?? 1);
       
-      // Проверка на возможность отклика (заполнены навыки)
-      canApply = studentProfile.skills.length > 0;
+      // Если список специальностей не пуст, проверяем вхождение
+      const allowedMajorIds = vacancy.allowedMajors.map(m => m.majorId);
+      const majorMatch = allowedMajorIds.length === 0 || (!!studentProfile.majorId && allowedMajorIds.includes(studentProfile.majorId));
+
+      if (!hasSkills) errorReason = "Заполните навыки в профиле";
+      else if (!courseMatch) errorReason = `Требуется курс не ниже ${vacancy.minCourse}`;
+      else if (!majorMatch) errorReason = "Ваша специальность не подходит для данной позиции";
+      else if (isFull) errorReason = "Места закончились";
+      else if (!vacancy.isActive) errorReason = "Вакансия скрыта";
+
+      canApply = !!(hasSkills && courseMatch && majorMatch && !isFull && (vacancy.isActive ?? false));
     }
   }
 
@@ -73,6 +96,7 @@ export default async function PracticeDetailsPage({ params }: PageProps) {
       logoUrl,
     },
     skills: vacancy.requiredSkills.map(rs => rs.skill),
+    approvedCount: vacancy.applications.length,
   };
 
   return (
@@ -80,6 +104,9 @@ export default async function PracticeDetailsPage({ params }: PageProps) {
       data={formattedData}
       isApplied={isApplied}
       canApply={canApply}
+      isLoggined={isLoggined}
+      isFull={isFull}
+      errorReason={errorReason}
     />
   );
 }

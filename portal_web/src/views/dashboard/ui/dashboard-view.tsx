@@ -1,36 +1,36 @@
 // src/views/dashboard/ui/dashboard-view.tsx
-import { auth, signOut } from "@/auth";
-import { Button } from "@/components/ui/button";
+import { auth } from "@/auth";
+import { Button } from "@/shared/ui/button";
 import { redirect } from "next/navigation";
-import { StudentDashboard } from "./student-dashboard"; // Мы создадим это
-import { PartnerDashboard } from "./partner-dashboard"; // И это
+import { StudentDashboard } from "./student-dashboard";
+import { PartnerDashboard } from "./partner-dashboard";
 import Link from "next/link";
 
-interface DashboardViewProps {
-  searchParams?: {
-    filter?: string;
-  };
-}
-
-export async function DashboardView({ searchParams }: DashboardViewProps) {
+export async function DashboardView() {
   const session = await auth();
   
   if (!session?.user?.id) redirect("/login");
 
   const userRole = session.user.role;
   const userId = parseInt(session.user.id);
-  const filterType = searchParams?.filter || "all";
+
+
+  const textRoleConfig = {
+    student: "Студент",
+    organization_representative: "Партнер",
+    university_staff: "Сотрудник ВУЗа",
+    admin: "Администратор",
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl min-h-screen">
       {/* ОБЩИЙ HEADER СТРАНИЦЫ */}
-      <div className="flex flex-col md:flex-row justify-between items-end gap-4 mb-8">
+      <div className="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-8">
         <div>
-           <h1 className="text-3xl font-bold text-slate-900">Личный кабинет</h1>
-           <p className="text-slate-500 mt-1">
-              Роль: <span className="font-medium text-slate-900">
-                {userRole === 'organization_representative' ? 'Партнер' : 
-                 userRole === 'student' ? 'Студент' : 'Сотрудник ВУЗа'}
+           <h1 className="text-3xl font-bold text-foreground">Личный кабинет</h1>
+           <p className="text-muted-foreground mt-1">
+              Роль: <span className="font-medium text-foreground">
+                {textRoleConfig[userRole] || 'Неизвестная роль'}
               </span>
            </p>
         </div>
@@ -38,7 +38,7 @@ export async function DashboardView({ searchParams }: DashboardViewProps) {
 
       {/* РОУТИНГ ПО РОЛЯМ */}
       {userRole === "student" && (
-        <StudentDashboard userId={userId} filterType={filterType} />
+        <StudentDashboard userId={userId} />
       )}
 
       {userRole === "organization_representative" && (
@@ -47,13 +47,13 @@ export async function DashboardView({ searchParams }: DashboardViewProps) {
 
       {userRole === "university_staff" && (
         <div className="space-y-6">
-           <div className="p-8 bg-purple-50 border border-purple-200 rounded-lg flex justify-between items-center">
+           <div className="p-8 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg flex justify-between items-center">
              <div>
-                <h2 className="text-2xl font-bold text-purple-900 mb-2">Панель управления ВУЗа</h2>
-                <p className="text-purple-700">Управляйте заявками организаций и доступом к порталу.</p>
+                <h2 className="text-2xl font-bold text-purple-900 dark:text-purple-300 mb-2">Панель управления ВУЗа</h2>
+                <p className="text-purple-700 dark:text-purple-400">Управляйте заявками организаций и доступом к порталу.</p>
              </div>
              <Link href="/dashboard/admin">
-               <Button size="lg" className="bg-purple-600 hover:bg-purple-700">
+               <Button size="lg" className="bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-400">
                  Перейти к модерации
                </Button>
              </Link>

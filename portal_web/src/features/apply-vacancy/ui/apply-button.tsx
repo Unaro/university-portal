@@ -4,7 +4,7 @@
 import { useActionState, useEffect } from "react";
 import { applyToVacancy } from "@/app/actions/application";
 import { ActionResponse } from "@/shared/types/action";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { toast } from "sonner";
 
 interface ApplyButtonProps {
@@ -29,7 +29,7 @@ export function ApplyButton({ vacancyId, isApplied, disabled, className }: Apply
 
   if (isApplied || state.success) {
     return (
-      <Button disabled variant="secondary" className={`bg-green-100 text-green-800 opacity-100 ${className}`}>
+      <Button disabled variant="secondary" className={`bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400 opacity-100 ${className}`}>
         ✓ Вы откликнулись
       </Button>
     );

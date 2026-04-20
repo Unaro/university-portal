@@ -2,7 +2,7 @@
 "use client";
 
 import { signOut } from "next-auth/react"; // Используем клиентский метод для простоты
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { LogOut } from "lucide-react";
 
 export function LogoutButton() {

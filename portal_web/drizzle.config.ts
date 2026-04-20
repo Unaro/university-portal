@@ -2,7 +2,6 @@ import { defineConfig } from "drizzle-kit";
 import * as dotenv from "dotenv";
 import { join } from "path";
 
-// Загружаем .env из корня проекта (parent directory)
 dotenv.config({ path: join(__dirname, "../.env") });
 
 const connectionString = process.env.DATABASE_URL;
@@ -12,8 +11,8 @@ if (!connectionString) {
 }
 
 export default defineConfig({
-  schema: join(__dirname, "src/db/schema.ts"),
-  out: join(__dirname, "drizzle"),
+  schema: "src/db/schema.ts",
+  out: "drizzle",
   dialect: "postgresql",
   dbCredentials: {
     url: connectionString,

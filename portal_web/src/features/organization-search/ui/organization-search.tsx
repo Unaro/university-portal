@@ -3,9 +3,9 @@
 
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/shared/ui/input";
 import { Search, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 
 export function OrganizationSearch() {
   const searchParams = useSearchParams();
@@ -29,14 +29,14 @@ export function OrganizationSearch() {
       <Search className="absolute left-3 h-4 w-4 text-muted-foreground z-10 pointer-events-none" />
       <Input
         placeholder="Поиск компании или отрасли..."
-        className="bg-white w-full pl-10 h-11 text-base shadow-sm"
+        className="bg-card w-full pl-10 h-11 text-base shadow-sm"
         defaultValue={currentSearch}
         onChange={(e) => handleSearch(e.target.value)}
       />
       {currentSearch && (
-        <Button 
-            variant="ghost" 
-            size="icon" 
+        <Button
+            variant="ghost"
+            size="icon"
             className="absolute right-1 h-8 w-8 hover:bg-transparent"
             onClick={() => handleSearch("")}
         >

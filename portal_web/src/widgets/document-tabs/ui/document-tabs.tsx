@@ -1,10 +1,10 @@
 // src/widgets/document-tabs/ui/document-tabs.tsx
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/shared/ui/card";
 import { MaterialRow } from "@/entities/material/ui/material-row";
 import { MaterialForm } from "@/features/manage-materials/ui/material-form"; // Импортируем форму
 import { Material } from "@/shared/types/db";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import { Trash2 } from "lucide-react";
 import { deleteMaterial } from "@/app/actions/material";
 
@@ -28,7 +28,7 @@ export function DocumentTabs({ materials, isAdmin }: DocumentTabsProps) {
              <MaterialRow data={doc} />
              {/* Кнопка удаления для Админа (появляется при наведении или всегда) */}
              {isAdmin && (
-               <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 bg-white/80 p-1 rounded shadow-sm">
+               <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 bg-background/80 p-1 rounded shadow-sm">
                   <form action={async () => { "use server"; await deleteMaterial(doc.id); }}> {/* Исправить удаление файла из сервера S3 */}
                     <Button variant="destructive" size="icon" className="h-8 w-8" title="Удалить">
                       <Trash2 size={14} /> {/* Исправить меню удаления материала(налезание на кнопку скачивания) */}
@@ -48,14 +48,14 @@ export function DocumentTabs({ materials, isAdmin }: DocumentTabsProps) {
     <div className="space-y-8">
       {/* Блок добавления для Админа (над табами) */}
       {isAdmin && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
-          <h3 className="text-lg font-bold text-blue-900 mb-4">Панель администратора</h3>
+        <div className="bg-primary/10 border border-primary/30 rounded-lg p-6 mb-8">
+          <h3 className="text-lg font-bold text-primary mb-4">Панель администратора</h3>
           <MaterialForm />
         </div>
       )}
 
       <Tabs defaultValue="materials" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-8 h-auto p-1 bg-slate-100">
+        <TabsList className="grid w-full grid-cols-3 mb-8 h-auto p-1 bg-muted">
           <TabsTrigger value="materials" className="py-3">Полезные материалы</TabsTrigger>
           <TabsTrigger value="regulatory" className="py-3">Нормативные акты</TabsTrigger>
           <TabsTrigger value="templates" className="py-3">Шаблоны заявлений</TabsTrigger>

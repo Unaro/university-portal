@@ -1,13 +1,14 @@
 // src/widgets/header/ui/header.tsx
 import { auth } from "@/auth";
 import { HeaderClient } from "./header-client";
+import { ThemeToggle } from "@/shared/ui/theme-toggle";
 
 export async function Header() {
-  const session = await auth(); // Получает свежую сессию при router.refresh()
-  
+  const session = await auth();
+
   return (
-    <HeaderClient 
-      isLoggedIn={!!session?.user} 
+    <HeaderClient
+      isLoggedIn={!!session?.user}
       userRole={session?.user?.role}
       userName={session?.user?.name}
       userImage={session?.user?.image}

@@ -1,0 +1,1 @@
+ALTER TABLE "vacancy" ADD COLUMN "available_spots" integer;
