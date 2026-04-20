@@ -36,7 +36,7 @@ export function VacancyFilter({ isStudent }: VacancyFilterProps) {
   const handleFilter = (key: string, value: string, checked: boolean) => {
     const params = new URLSearchParams(searchParams);
     const current = params.get(key)?.split(",") || [];
-    let updated = checked ? [...current, value] : current.filter(v => v !== value);
+    const updated = checked ? [...current, value] : current.filter(v => v !== value);
 
     if (updated.length > 0) params.set(key, updated.join(","));
     else params.delete(key);

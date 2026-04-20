@@ -78,7 +78,7 @@ export async function createVacancy(
     return {
       success: false,
       message: "Ошибка валидации. Проверьте введенные данные.",
-      errors: validated.error.flatten().fieldErrors as any,
+      errors: validated.error.flatten().fieldErrors,
     };
   }
 

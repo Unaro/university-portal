@@ -301,7 +301,7 @@ async function seedDatabase() {
       type: v.type,
       salary: v.salary,
       minCourse: v.minCourse,
-      availableSpots: (v as any).availableSpots || null,
+      availableSpots: (v as { availableSpots?: number }).availableSpots || null,
       startDate: v.startDate || null,
       endDate: v.endDate || null,
       })))

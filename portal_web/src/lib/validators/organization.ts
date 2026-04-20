@@ -11,7 +11,7 @@ export const registerOrganizationSchema = z.object({
   website: z.string().url("Введите корректкий URL").optional().or(z.literal("")),
   contacts: z.string().min(5, "Укажите контактные данные"),
   logo: z
-    .any()
+    .custom<File | { size: number; type: string } | null | undefined>()
     .refine(
       (file) => file === null || file === undefined || file instanceof File || (file?.size && file?.type),
       { message: "Требуется файл изображения" }

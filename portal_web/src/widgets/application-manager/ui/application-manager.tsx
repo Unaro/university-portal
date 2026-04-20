@@ -80,7 +80,7 @@ export async function ApplicationManager({ userId, statusFilter, vacancyIdFilter
       ne(vacancies.type, "practice"),
       eq(applications.universityApprovalStatus, "approved")
     ),
-    statusFilter !== "all" ? eq(applications.status, statusFilter as any) : undefined
+    statusFilter !== "all" ? eq(applications.status, statusFilter as "pending" | "approved" | "rejected") : undefined
   );
 
   const [countResult] = await db

@@ -138,7 +138,7 @@ export const STUDENTS = Array.from({ length: 20 }).map((_, i) => ({
   group: `ГР-${20 + (i % 3)}-${(i % 5) + 1}`,
   course: (i % 4) + 1,
   majorIndex: i % 5,
-  currentPracticeType: ["educational", "production", "pre_diploma"][i % 3] as any,
+  currentPracticeType: ["educational", "production", "pre_diploma"][i % 3] as "educational" | "production" | "pre_diploma",
   projectTheme: `Тема проекта студента #${i + 1}`,
 }));
 
