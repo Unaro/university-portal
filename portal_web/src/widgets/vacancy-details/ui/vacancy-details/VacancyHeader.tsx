@@ -19,6 +19,7 @@ export function VacancyHeader({ data, isApplied, canApply, isLoggined, isFull, e
                       alt="Logo" 
                       width={20} 
                       height={20} 
+                      unoptimized
                       className="object-contain" 
                     />
                 ) : (

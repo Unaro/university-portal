@@ -8,7 +8,7 @@ const REGION = process.env.S3_REGION || "us-east-1";
 // Адреса из переменных окружения
 const INTERNAL_ENDPOINT = process.env.S3_ENDPOINT || "http://minio:9000";
 // Если PUBLIC переменная не задана, падаем обратно на localhost (для локальной разработки без сети)
-const PUBLIC_ENDPOINT = process.env.S3_PUBLIC_ENDPOINT || "http://localhost:9000";
+const PUBLIC_ENDPOINT = process.env.NEXT_PUBLIC_S3_ENDPOINT || process.env.S3_PUBLIC_ENDPOINT || "http://localhost:9000";
 
 // 1. ВНУТРЕННИЙ КЛИЕНТ (Сервер -> MinIO)
 // Оптимизирован для работы внутри Docker

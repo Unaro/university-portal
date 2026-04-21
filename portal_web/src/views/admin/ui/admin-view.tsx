@@ -71,6 +71,7 @@ export async function AdminView() {
                               alt="Logo" 
                               width={40} 
                               height={40} 
+                              unoptimized
                               className="object-contain" 
                             />
                         )}

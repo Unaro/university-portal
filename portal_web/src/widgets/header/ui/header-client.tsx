@@ -8,6 +8,7 @@ import { Button } from "@/shared/ui/button";
 import {
   LogIn, UserPlus, LayoutDashboard, User, Menu, X,
   Home, Briefcase, Building2, FileText, LogOut,
+  Settings,
 } from "lucide-react";
 import { LogoutDropdownItem } from "@/features/auth/ui/logout-dropdown-item";
 import {
@@ -238,6 +239,12 @@ function UserDropdown({ userName, userImage, userEmail, userRole, getInitials }:
             {userRole === "student" ? "Личный кабинет" : "Панель управления"}
           </Link>
         </DropdownMenuItem>
+        
+        {userRole === "organization_representative" && <DropdownMenuItem asChild>
+          <Link href={"/dashboard/organization"} className="flex w-full cursor-pointer">
+            <Settings className="mr-2 h-4 w-4" /> Настройки
+          </Link>
+        </DropdownMenuItem>}
         <DropdownMenuSeparator />
         <LogoutDropdownItem />
       </DropdownMenuContent>
@@ -267,6 +274,7 @@ function MobileUserActions({ userRole, onClose }: MobileUserActionsProps) {
   const Icon = userRole === "student" ? User : LayoutDashboard;
 
   return (
+    <>
     <Link
       href={dashboardHref}
       onClick={onClose}
@@ -275,6 +283,12 @@ function MobileUserActions({ userRole, onClose }: MobileUserActionsProps) {
       <Icon className="h-4 w-4" />
       {label}
     </Link>
+    {userRole === "organization_representative" && 
+      <Link href={"/dashboard/organization"} className="flex w-full cursor-pointer">
+        <Settings className="mr-2 h-4 w-4" /> Настройки
+      </Link>}
+    </>
+    
   );
 }
 
