@@ -355,8 +355,6 @@ university-portal/
 │   │   │   ├── layout.tsx      # Корневой layout
 │   │   │   ├── page.tsx        # Главная страница
 │   │   │   └── providers.tsx   # Провайдеры (Theme, Session)
-│   │   ├── components/         # UI-компоненты (shadcn/ui)
-│   │   │   └── ui/             # Базовые компоненты
 │   │   ├── db/                 # Работа с базой данных
 │   │   │   ├── schema.ts       # Схема БД (Drizzle)
 │   │   │   ├── index.ts        # Экспорт db
@@ -396,7 +394,6 @@ university-portal/
 │   ├── tests/                  # E2E и интеграционные тесты
 │   ├── public/                 # Статические файлы
 │   ├── drizzle/                # Миграции БД
-│   ├── scripts/                # Скрипты (PDF и др.)
 │   ├── auth.config.ts          # Конфигурация NextAuth
 │   ├── auth.ts                 # Инициализация NextAuth
 │   ├── components.json         # Конфигурация shadcn/ui
