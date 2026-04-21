@@ -36,22 +36,25 @@ export async function UniversityApplicationManager() {
   );
 
   return (
-    <div className="space-y-6 mt-10">
-      <h2 className="text-xl font-semibold text-foreground">Заявки студентов на практику (Ожидают одобрения ВУЗа)</h2>
+    <div className="space-y-6 mt-10 print:mt-4 print:space-y-4">
+      <h2 className="text-xl font-semibold text-foreground print:text-lg">Заявки студентов на практику (Ожидают одобрения ВУЗа)</h2>
       {filteredApps.length === 0 ? (
-        <div className="p-10 bg-muted text-muted-foreground rounded border border-dashed text-center">
+        <div className="p-10 bg-muted text-muted-foreground rounded border border-dashed text-center print:border-solid print:p-4 print:text-sm">
           Нет заявок на практику, ожидающих вашего одобрения.
         </div>
       ) : (
-        <div className="grid gap-6">
+        <div className="grid gap-6 print:block print:space-y-4">
           {filteredApps.map((app) => (
-            <ApplicationCard
-              key={app.id}
-              data={app}
-              actionSlot={
-                <UniversityApplicationResponseForm applicationId={app.id} />
-              }
-            />
+            <div key={app.id} className="print:break-inside-avoid">
+              <ApplicationCard
+                data={app}
+                actionSlot={
+                  <div className="print:hidden">
+                    <UniversityApplicationResponseForm applicationId={app.id} />
+                  </div>
+                }
+              />
+            </div>
           ))}
         </div>
       )}

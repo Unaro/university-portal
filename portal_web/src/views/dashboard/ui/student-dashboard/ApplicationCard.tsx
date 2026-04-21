@@ -52,48 +52,50 @@ export function ApplicationCard({ application }: { application: ApplicationWithD
   }
 
   return (
-    <div className="bg-card border rounded-lg p-5 hover:shadow-md transition-shadow">
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-3">
+    <div className="bg-card border rounded-lg p-5 hover:shadow-md transition-shadow print:shadow-none print:border-b print:border-gray-300 print:border-x-0 print:border-t-0 print:rounded-none print:p-0 print:py-4 print:mb-4">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-3 print:flex-row print:mb-2">
         <div>
-          <h3 className="text-lg font-semibold text-foreground">{vacancy.title}</h3>
-          <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-muted-foreground">
+          <h3 className="text-lg font-semibold text-foreground print:text-black">{vacancy.title}</h3>
+          <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-muted-foreground print:text-black">
             <span className="flex items-center gap-1.5">
-              <Building2 size={14} /> {vacancy.organization.name}
+              <Building2 size={14} className="print:hidden" /> {vacancy.organization.name}
             </span>
             <span className="flex items-center gap-1.5">
-              <CalendarDays size={14} /> {formatDate(createdAt)}
+              <CalendarDays size={14} className="print:hidden" /> {formatDate(createdAt)}
             </span>
           </div>
         </div>
-        <Badge className={`${displayStatus.color} border`}>{displayStatus.label}</Badge>
+        <Badge className={`${displayStatus.color} border print:bg-transparent print:border-none print:text-black print:p-0 print:font-bold`}>
+          {displayStatus.label}
+        </Badge>
       </div>
 
-      <div className="flex flex-wrap items-center gap-4 mb-3 text-sm text-muted-foreground">
-        <span className="flex items-center gap-1.5 bg-secondary px-2 py-0.5 rounded text-xs font-medium">
-          {typeIcon} {typeLabel}
+      <div className="flex flex-wrap items-center gap-4 mb-3 text-sm text-muted-foreground print:text-black print:mb-2">
+        <span className="flex items-center gap-1.5 bg-secondary px-2 py-0.5 rounded text-xs font-medium print:bg-transparent print:p-0 print:text-black">
+          <span className="print:hidden">{typeIcon}</span> {typeLabel}
           {isPractice && practiceType && ` (${practiceTypeMap[practiceType]})`}
         </span>
         {vacancy.salary && (
           <span className="flex items-center gap-1.5">
-            <Coins size={14} /> {vacancy.salary}
+            <Coins size={14} className="print:hidden" /> {vacancy.salary}
           </span>
         )}
       </div>
 
       {isPractice && projectTheme && (
-        <div className="mb-4 text-sm bg-muted/30 p-2 rounded border border-border/50">
-          <span className="text-muted-foreground">Тема проекта: </span>
-          <span className="font-medium text-foreground">{projectTheme}</span>
+        <div className="mb-4 text-sm bg-muted/30 p-2 rounded border border-border/50 print:bg-transparent print:border-none print:p-0 print:mb-2">
+          <span className="text-muted-foreground print:text-black">Тема проекта: </span>
+          <span className="font-medium text-foreground print:text-black">{projectTheme}</span>
         </div>
       )}
 
       {responseMessage && (
-        <div className="bg-muted/50 border-l-4 border-primary p-3 rounded-r mb-4">
-          <p className="text-sm italic text-muted-foreground">&quot;{responseMessage}&quot;</p>
+        <div className="bg-muted/50 border-l-4 border-primary p-3 rounded-r mb-4 print:bg-transparent print:border-none print:p-0 print:mb-2">
+          <p className="text-sm italic text-muted-foreground print:text-black"><span className="print:font-bold print:not-italic print:mr-1 print:hidden">Ответ:</span>&quot;{responseMessage}&quot;</p>
         </div>
       )}
 
-      <div className="flex items-center justify-between pt-3 border-t mt-2">
+      <div className="flex items-center justify-between pt-3 border-t mt-2 print:hidden">
         {status === 'approved' ? (
           <a 
             href={`/api/documents/${application.id}`} 

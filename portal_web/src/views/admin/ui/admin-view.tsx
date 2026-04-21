@@ -34,14 +34,16 @@ export async function AdminView() {
   );
 
   return (
-    <div className="p-10 max-w-6xl mx-auto min-h-screen">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Панель модератора</h1>
-        <BackButton variant="outline" label="Назад" />
+    <div className="p-10 max-w-6xl mx-auto min-h-screen print:p-0 print:min-h-0">
+      <div className="flex justify-between items-center mb-6 print:mb-4">
+        <h1 className="text-3xl font-bold print:text-2xl">Панель модератора</h1>
+        <div className="print:hidden">
+          <BackButton variant="outline" label="Назад" />
+        </div>
       </div>
 
       {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 print:mb-6">
           <StatsCard variant="mini" label="Студентов" value={stats.totalStudents}/>
           <StatsCard variant="mini" label="Компаний" value={stats.totalCompanies}/>
           <StatsCard variant="mini" label="Заявок" value={stats.totalApplications}/>
@@ -49,21 +51,21 @@ export async function AdminView() {
         </div>
       )}
 
-      <div className="space-y-6">
-        <h2 className="text-xl font-semibold text-foreground">Заявки организаций</h2>
+      <div className="space-y-6 print:space-y-4">
+        <h2 className="text-xl font-semibold text-foreground print:text-lg">Заявки организаций</h2>
         {orgsWithLogos.length === 0 ? (
-          <div className="p-10 bg-muted text-muted-foreground rounded border border-dashed text-center">
+          <div className="p-10 bg-muted text-muted-foreground rounded border border-dashed text-center print:border-solid print:p-4">
             Все заявки обработаны.
           </div>
         ) : (
-          <div className="grid gap-6">
+          <div className="grid gap-6 print:block print:space-y-4">
             {orgsWithLogos.map((org) => (
-               <Card key={org.id}>
-                  <CardHeader className="bg-muted border-b pb-4">
+               <Card key={org.id} className="print:shadow-none print:border-gray-200 print:break-inside-avoid">
+                  <CardHeader className="bg-muted border-b pb-4 print:bg-transparent print:p-3">
                       <div className="flex justify-between items-start">
                         <div>
-                            <CardTitle>{org.name}</CardTitle>
-                            <p className="text-sm text-muted-foreground mt-1">ИИН: {org.iin}</p>
+                            <CardTitle className="print:text-base">{org.name}</CardTitle>
+                            <p className="text-sm text-muted-foreground mt-1 print:text-xs">ИИН: {org.iin}</p>
                         </div>
                         {org.logoUrl && (
                             <Image 
@@ -72,18 +74,18 @@ export async function AdminView() {
                               width={40} 
                               height={40} 
                               unoptimized
-                              className="object-contain" 
+                              className="object-contain print:w-8 print:h-8" 
                             />
                         )}
                       </div>
                   </CardHeader>
-                  <CardContent className="pt-6">
-                     <div className="grid md:grid-cols-2 gap-6">
-                        <div className="space-y-2 text-sm">
+                  <CardContent className="pt-6 print:pt-3 print:pb-3">
+                     <div className="grid md:grid-cols-2 gap-6 print:grid-cols-1 print:gap-2">
+                        <div className="space-y-2 text-sm print:text-xs print:space-y-1">
                            <p>Контакты: {org.contacts}</p>
                            <p>Представитель: {org.representatives[0]?.user.name} ({org.representatives[0]?.user.email})</p>
                         </div>
-                        <div className="flex justify-end gap-3">
+                        <div className="flex justify-end gap-3 print:hidden">
                             <form action={async () => { "use server"; await verifyOrganization(org.id, "rejected"); }}>
                                <Button variant="destructive">Отклонить</Button>
                             </form>
@@ -99,7 +101,9 @@ export async function AdminView() {
         )}
       </div>
 
-      <UniversityApplicationManager />
+      <div className="mt-8 print:mt-6">
+        <UniversityApplicationManager />
+      </div>
     </div>
   );
 }

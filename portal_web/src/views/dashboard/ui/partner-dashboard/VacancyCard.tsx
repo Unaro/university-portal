@@ -74,7 +74,7 @@ export function VacancyCard({ vacancy }: VacancyCardProps) {
           </div>
         </div>
 
-        <div className="flex sm:flex-col gap-2 sm:items-end min-w-[140px]">
+        <div className="flex sm:flex-col gap-2 sm:items-end min-w-[140px] print:hidden">
           <Button variant="secondary" size="sm" asChild className="w-full">
             <Link href={`/dashboard/applications?vacancy=${vacancy.id}`}>К заявкам →</Link>
           </Button>
