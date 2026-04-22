@@ -53,11 +53,10 @@ export async function createMaterial(
       title: validated.data.title,
       description: validated.data.description,
       fileUrl: fileUrl,
-      category: validated.data.category as "regulatory" | "template" | "material",
+      category: validated.data.category,
       isPublic: true,
     });
 
-    // 👇 ОБНОВЛЕННЫЕ ПУТИ
     revalidatePath("/documents"); 
     revalidatePath("/dashboard/admin");
     

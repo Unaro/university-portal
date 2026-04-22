@@ -49,44 +49,47 @@ export function ApplicationCard({ data, actionSlot }: ApplicationCardProps) {
   };
 
   return (
-    <Card className="overflow-hidden flex flex-col lg:flex-row">
+    <Card className="overflow-hidden flex flex-col lg:flex-row print:flex-col print:shadow-none print:border-b print:border-gray-300 print:border-x-0 print:border-t-0 print:rounded-none print:break-inside-avoid print:pb-4 print:mb-4">
       {/* ЛЕВАЯ ЧАСТЬ: Профиль */}
-      <div className="flex-grow p-6 border-b lg:border-b-0 lg:border-r">
-        <div className="flex items-start gap-4">
-          <Avatar className="w-16 h-16 border-2 border-card shadow-sm">
+      <div className="flex-grow p-6 border-b lg:border-b-0 lg:border-r print:p-0 print:border-none">
+        <div className="flex items-start gap-4 print:gap-3">
+          <Avatar className="w-16 h-16 border-2 border-card shadow-sm print:w-10 print:h-10">
             <AvatarImage src={data.student.user.image || ""} />
-            <AvatarFallback className="bg-primary/10 text-primary text-lg font-bold">
+            <AvatarFallback className="bg-primary/10 text-primary text-lg font-bold print:text-base">
               {getInitials(data.student.user.name || "?")}
             </AvatarFallback>
           </Avatar>
 
           <div className="flex-grow">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 print:flex-row print:items-start">
               <div>
-                <h3 className="text-xl font-bold text-foreground">{data.student.user.name}</h3>
-                <p className="text-muted-foreground text-sm flex items-center gap-2 mt-1">
-                  <span className="bg-muted px-2 py-0.5 rounded text-foreground font-medium text-xs">
+                <h3 className="text-xl font-bold text-foreground print:text-lg">{data.student.user.name}</h3>
+                <p className="text-muted-foreground text-sm flex items-center gap-2 mt-1 print:text-xs">
+                  <span className="bg-muted px-2 py-0.5 rounded text-foreground font-medium text-xs print:bg-transparent print:p-0 print:px-0">
                     {data.student.course} курс
                   </span>
                   <span>•</span>
                   <span>{data.student.major?.name || "Специальность не указана"}</span>
                 </p>
               </div>
-              <div className="text-right">
-                <Badge variant="secondary" className="font-normal text-muted-foreground bg-muted mb-2 inline-block">
+              <div className="text-right print:text-left print:mt-1">
+                <p className="text-sm text-muted-foreground mb-1 hidden print:block">
+                  На вакансию: <span className="font-semibold text-black">{data.vacancy.title}</span>
+                </p>
+                <Badge variant="secondary" className="font-normal text-muted-foreground bg-muted mb-2 inline-block print:hidden">
                   На вакансию: <span className="font-semibold text-foreground ml-1">{data.vacancy.title}</span>
                 </Badge>
                 
                 {data.vacancy.type === "practice" && (
-                  <div className="space-y-1">
+                  <div className="space-y-1 print:flex print:gap-3 print:space-y-0 print:items-center">
                     {data.practiceType && (
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-xs text-muted-foreground print:text-xs print:text-black">
                         Тип: <span className="font-semibold">{practiceTypeMap[data.practiceType]}</span>
                       </div>
                     )}
                     {(data.vacancy.startDate || data.vacancy.endDate) && (
-                      <div className="text-xs text-orange-600 dark:text-orange-400 font-medium flex items-center justify-end gap-1">
-                        <Calendar size={12} />
+                      <div className="text-xs text-orange-600 dark:text-orange-400 font-medium flex items-center justify-end gap-1 print:text-black print:justify-start">
+                        <Calendar size={12} className="print:hidden" />
                         {formatDate(data.vacancy.startDate)} — {formatDate(data.vacancy.endDate)}
                       </div>
                     )}
@@ -96,45 +99,46 @@ export function ApplicationCard({ data, actionSlot }: ApplicationCardProps) {
             </div>
 
             {data.vacancy.type === "practice" && data.projectTheme && (
-              <div className="mt-3 bg-muted/50 p-3 rounded-md text-sm border border-border/50">
-                <span className="font-semibold block mb-1">Тема проекта:</span>
-                <span className="italic text-muted-foreground">{data.projectTheme}</span>
+              <div className="mt-3 bg-muted/50 p-3 rounded-md text-sm border border-border/50 print:bg-transparent print:p-0 print:border-none print:mt-2">
+                <span className="font-semibold block mb-1 print:inline print:mr-1">Тема проекта:</span>
+                <span className="italic text-muted-foreground print:inline print:text-black">{data.projectTheme}</span>
               </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Mail size={14} className="text-muted-foreground/60" /> {data.student.user.email}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 print:mt-2 print:gap-1 print:text-xs print:flex print:flex-wrap print:items-center">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground print:text-xs print:text-black">
+                <Mail size={14} className="text-muted-foreground/60 print:hidden" /> {data.student.user.email}
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Calendar size={14} className="text-muted-foreground/60" />
+              <span className="hidden print:inline text-muted-foreground">•</span>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground print:text-xs print:text-black">
+                <Calendar size={14} className="text-muted-foreground/60 print:hidden" />
                 Отклик: {data.createdAt ? new Date(data.createdAt).toLocaleDateString("ru-RU") : ""}
               </div>
             </div>
 
-            <div className="mt-5">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Навыки</p>
+            <div className="mt-5 print:mt-3">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 print:mb-1 print:text-black print:normal-case">Навыки:</p>
               {data.student.skills.length > 0 ? (
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1.5 print:gap-1 print:inline-flex">
                   {data.student.skills.map((s) => (
-                    <span key={s.skill.id} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary border">
+                    <span key={s.skill.id} className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary border print:bg-transparent print:border-none print:px-0 print:py-0 print:text-black print:after:content-[','] last:print:after:content-['']">
                       {s.skill.name}
                     </span>
                   ))}
                 </div>
               ) : (
-                <span className="text-sm text-muted-foreground italic">Не указаны</span>
+                <span className="text-sm text-muted-foreground italic print:text-xs print:text-black">Не указаны</span>
               )}
             </div>
 
-            <div className="mt-6 pt-4 border-t">
+            <div className="mt-6 pt-4 border-t print:mt-3 print:pt-3 print:border-t print:border-gray-200">
               <div className="flex items-start gap-3">
-                <div className="mt-1 bg-muted p-2 rounded text-muted-foreground">
+                <div className="mt-1 bg-muted p-2 rounded text-muted-foreground print:hidden">
                   <FileText size={18} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">Резюме / О себе</p>
-                  <p className="text-sm text-muted-foreground mt-1 line-clamp-3 italic">
+                  <p className="text-sm font-medium text-foreground print:font-semibold print:text-black">Резюме / О себе</p>
+                  <p className="text-sm text-muted-foreground mt-1 line-clamp-3 italic print:text-sm print:text-black print:line-clamp-none">
                     {data.student.resume?.bio || "Кандидат не добавил описание."}
                   </p>
 
@@ -143,7 +147,7 @@ export function ApplicationCard({ data, actionSlot }: ApplicationCardProps) {
                       href={data.resumeLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 mt-3 group"
+                      className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 mt-3 group print:hidden"
                     >
                       <Download size={16} className="group-hover:translate-y-0.5 transition-transform" />
                       Скачать полный PDF
@@ -157,7 +161,7 @@ export function ApplicationCard({ data, actionSlot }: ApplicationCardProps) {
       </div>
 
       {/* ПРАВАЯ ЧАСТЬ: Слот для действий */}
-      <div className="lg:w-[350px] bg-muted/50 p-6 flex flex-col justify-center">
+      <div className="lg:w-[350px] bg-muted/50 p-6 flex flex-col justify-center print:w-full print:bg-transparent print:p-0 print:border-none print:block">
         {actionSlot}
       </div>
     </Card>

@@ -36,10 +36,10 @@ export async function PartnerDashboard({ userId }: PartnerDashboardProps) {
   }) as VacancyWithApplications[];
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6 p-4 print:p-0">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Вакансии: {rep.organization.name}</h1>
-        <div className="flex gap-2">
+        <h1 className="text-2xl font-bold print:text-xl">Вакансии: {rep.organization.name}</h1>
+        <div className="flex gap-2 print:hidden">
           <Button variant="outline" asChild>
             <Link href="/dashboard/applications?status=all" className="flex items-center gap-2">
               <Users size={16} /> Все заявки
@@ -54,15 +54,17 @@ export async function PartnerDashboard({ userId }: PartnerDashboardProps) {
       </div>
 
       {myVacancies.length === 0 ? (
-        <div className="text-center py-12 bg-muted/30 rounded-lg border border-dashed">
+        <div className="text-center py-12 bg-muted/30 rounded-lg border border-dashed print:border-solid print:border-gray-300">
           <p className="text-lg font-medium mb-2">У вас пока нет вакансий</p>
-          <p className="text-sm text-muted-foreground mb-4">Создайте первую вакансию, чтобы начать поиск студентов.</p>
-          <Button asChild><Link href="/dashboard/create-vacancy">Создать вакансию</Link></Button>
+          <p className="text-sm text-muted-foreground mb-4 print:hidden">Создайте первую вакансию, чтобы начать поиск студентов.</p>
+          <Button asChild className="print:hidden"><Link href="/dashboard/create-vacancy">Создать вакансию</Link></Button>
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-4 print:block print:space-y-4">
           {myVacancies.map((vac) => (
-            <VacancyCard key={vac.id} vacancy={vac} />
+            <div key={vac.id} className="print:break-inside-avoid">
+              <VacancyCard vacancy={vac} />
+            </div>
           ))}
         </div>
       )}

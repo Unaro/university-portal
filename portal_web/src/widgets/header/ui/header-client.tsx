@@ -8,6 +8,7 @@ import { Button } from "@/shared/ui/button";
 import {
   LogIn, UserPlus, LayoutDashboard, User, Menu, X,
   Home, Briefcase, Building2, FileText, LogOut,
+  Settings,
 } from "lucide-react";
 import { LogoutDropdownItem } from "@/features/auth/ui/logout-dropdown-item";
 import {
@@ -87,22 +88,22 @@ export function HeaderClient({
     name ? name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) : "??";
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 flex h-16 items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 print:relative print:border-none print:bg-transparent print:backdrop-blur-none print:z-auto">
+      <div className="container mx-auto px-4 flex h-16 items-center justify-between gap-4 print:h-auto print:py-4">
         
         {/* 1. Логотип */}
         <Link href="/" className="flex items-center gap-3 group shrink-0" onClick={closeMobileMenu}>
-          <div className="bg-primary text-primary-foreground p-2 rounded-full transition-transform group-hover:scale-105 shadow-sm">
-            <span className="h-5 w-5 flex items-center justify-center font-bold text-sm">С</span>
+          <div className="bg-primary text-primary-foreground p-2 rounded-full transition-transform group-hover:scale-105 shadow-sm print:bg-black print:text-white print:p-3">
+            <span className="h-5 w-5 flex items-center justify-center font-bold text-sm print:text-lg">С</span>
           </div>
-          <div className="flex-col leading-none hidden sm:flex">
-            <span className="font-bold text-xl tracking-wide text-foreground">СИБАДИ</span>
-            <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Портал трудоустройства</span>
+          <div className="flex-col leading-none hidden sm:flex print:flex">
+            <span className="font-bold text-xl tracking-wide text-foreground print:text-2xl">СИБАДИ</span>
+            <span className="text-[10px] text-muted-foreground uppercase tracking-widest print:text-xs print:text-black">Портал трудоустройства</span>
           </div>
         </Link>
 
         {/* 2. Десктопная навигация */}
-        <nav className="hidden lg:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-1 print:hidden">
           {NAV_LINKS.map((link) => (
             <HeaderLink
               key={link.href}
@@ -116,7 +117,7 @@ export function HeaderClient({
         </nav>
 
         {/* 3. Правая часть: Тема + Мобильное меню / Авторизация */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 print:hidden">
           <ThemeToggle />
 
           <Button
@@ -147,7 +148,7 @@ export function HeaderClient({
 
       {/* 4. Мобильное меню */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t bg-background px-4 py-3 shadow-lg animate-in slide-in-from-top-5">
+        <div className="lg:hidden border-t bg-background px-4 py-3 shadow-lg animate-in slide-in-from-top-5 print:hidden">
           <nav className="flex flex-col gap-1">
             {NAV_LINKS.map((link) => {
               const isActive = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
@@ -238,6 +239,12 @@ function UserDropdown({ userName, userImage, userEmail, userRole, getInitials }:
             {userRole === "student" ? "Личный кабинет" : "Панель управления"}
           </Link>
         </DropdownMenuItem>
+        
+        {userRole === "organization_representative" && <DropdownMenuItem asChild>
+          <Link href={"/dashboard/organization"} className="flex w-full cursor-pointer">
+            <Settings className="mr-2 h-4 w-4" /> Настройки
+          </Link>
+        </DropdownMenuItem>}
         <DropdownMenuSeparator />
         <LogoutDropdownItem />
       </DropdownMenuContent>
@@ -267,6 +274,7 @@ function MobileUserActions({ userRole, onClose }: MobileUserActionsProps) {
   const Icon = userRole === "student" ? User : LayoutDashboard;
 
   return (
+    <>
     <Link
       href={dashboardHref}
       onClick={onClose}
@@ -275,6 +283,12 @@ function MobileUserActions({ userRole, onClose }: MobileUserActionsProps) {
       <Icon className="h-4 w-4" />
       {label}
     </Link>
+    {userRole === "organization_representative" && 
+      <Link href={"/dashboard/organization"} className="flex w-full cursor-pointer">
+        <Settings className="mr-2 h-4 w-4" /> Настройки
+      </Link>}
+    </>
+    
   );
 }
 

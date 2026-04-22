@@ -23,8 +23,15 @@ export function OrganizationCard({ data }: OrganizationCardProps) {
       <Card className="h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-muted group-hover:border-primary/30 flex flex-col">
         <CardHeader className="flex flex-row items-start gap-4 pb-3">
           {data.logo ? (
-             // Если есть лого - показываем (пока заглушка для верстки, потом подключим S3 Image)
-             <Image src={data.logo} alt={data.name} className="w-14 h-14 rounded-xl object-contain border" />
+             // Если есть лого - показываем (используем unoptimized так как это внешний S3/MinIO)
+             <Image 
+               src={data.logo} 
+               alt={data.name} 
+               width={56} 
+               height={56} 
+               unoptimized 
+               className="w-14 h-14 rounded-xl object-contain border" 
+             />
           ) : (
              <div className={`w-14 h-14 rounded-xl ${logoColor} flex items-center justify-center text-primary-foreground font-bold text-xl shadow-md shrink-0`}>
                {data.name.charAt(0)}

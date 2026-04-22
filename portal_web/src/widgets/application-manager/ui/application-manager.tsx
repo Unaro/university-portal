@@ -134,7 +134,7 @@ export async function ApplicationManager({ userId, statusFilter, vacancyIdFilter
   return (
     <div className="flex flex-col gap-6">
       {/* Статистика */}
-      <div className={`grid gap-3 ${stats.universityPending > 0 ? "grid-cols-2 md:grid-cols-5" : "grid-cols-2 md:grid-cols-4"}`}>
+      <div className={`grid gap-3 print:gap-2 print:mb-4 ${stats.universityPending > 0 ? "grid-cols-2 md:grid-cols-5 print:grid-cols-5" : "grid-cols-2 md:grid-cols-4 print:grid-cols-4"}`}>
         <StatsCard variant="mini" icon={<Briefcase size={16} />} label="Всего" value={stats.total} />
         <StatsCard variant="mini" icon={<Clock size={16} />} label="Ждут" value={stats.pending} color="text-yellow-600" />
         {stats.universityPending > 0 && (
@@ -145,84 +145,98 @@ export async function ApplicationManager({ userId, statusFilter, vacancyIdFilter
       </div>
 
       {/* Табы фильтрации */}
-      <Tabs defaultValue={statusFilter} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 lg:w-fit lg:grid-cols-4">
-          <TabsTrigger value="all" asChild>
-            <Link href={`/dashboard/applications?status=all${vacancyQuery}`} scroll={false} prefetch>
-              Все
-            </Link>
-          </TabsTrigger>
-          <TabsTrigger value="pending" asChild>
-            <Link href={`/dashboard/applications?status=pending${vacancyQuery}`} scroll={false} prefetch>
-              На рассмотрении
-            </Link>
-          </TabsTrigger>
-          <TabsTrigger value="approved" asChild>
-            <Link href={`/dashboard/applications?status=approved${vacancyQuery}`} scroll={false} prefetch>
-              Приглашены
-            </Link>
-          </TabsTrigger>
-          <TabsTrigger value="rejected" asChild>
-            <Link href={`/dashboard/applications?status=rejected${vacancyQuery}`} scroll={false} prefetch>
-              Отказы
-            </Link>
-          </TabsTrigger>
-        </TabsList>
+      <div className="print:hidden">
+        <Tabs defaultValue={statusFilter} className="w-full">
+          <TabsList className="grid w-full grid-cols-4 lg:w-fit lg:grid-cols-4">
+            <TabsTrigger value="all" asChild>
+              <Link href={`/dashboard/applications?status=all${vacancyQuery}`} scroll={false} prefetch>
+                Все
+              </Link>
+            </TabsTrigger>
+            <TabsTrigger value="pending" asChild>
+              <Link href={`/dashboard/applications?status=pending${vacancyQuery}`} scroll={false} prefetch>
+                На рассмотрении
+              </Link>
+            </TabsTrigger>
+            <TabsTrigger value="approved" asChild>
+              <Link href={`/dashboard/applications?status=approved${vacancyQuery}`} scroll={false} prefetch>
+                Приглашены
+              </Link>
+            </TabsTrigger>
+            <TabsTrigger value="rejected" asChild>
+              <Link href={`/dashboard/applications?status=rejected${vacancyQuery}`} scroll={false} prefetch>
+                Отказы
+              </Link>
+            </TabsTrigger>
+          </TabsList>
 
-        {["all", "pending", "approved", "rejected"].map((status) => (
-          <TabsContent key={status} value={status} className="hidden" />
-        ))}
-      </Tabs>
+          {["all", "pending", "approved", "rejected"].map((status) => (
+            <TabsContent key={status} value={status} className="hidden" />
+          ))}
+        </Tabs>
+      </div>
 
       {/* Список заявок */}
       {filteredApps.length === 0 ? (
-        <div className="text-center py-16 bg-card border border-dashed rounded-xl">
-          <Briefcase size={32} className="mx-auto mb-3 text-muted-foreground" />
+        <div className="text-center py-16 bg-card border border-dashed rounded-xl print:border-solid print:py-4">
+          <Briefcase size={32} className="mx-auto mb-3 text-muted-foreground print:hidden" />
           <h3 className="text-lg font-medium">Заявок нет</h3>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-muted-foreground mt-1 print:hidden">
             {statusFilter !== "all" ? "Попробуйте изменить фильтр." : "Студенты еще не откликались на ваши вакансии."}
           </p>
         </div>
       ) : (
         <>
-          <div className="grid gap-6">
+          <div className="grid gap-6 print:block print:space-y-4">
             {filteredApps.map((app) => (
-              <ApplicationCard
-                key={app.id}
-                data={app}
-                actionSlot={
-                  app.status === "pending" ? (
-                    <ApplicationResponseForm applicationId={app.id} />
-                  ) : (
-                    <div className="h-full flex flex-col">
-                      <div
-                        className={`mb-4 flex items-center gap-2 font-bold text-sm px-3 py-2 rounded-md w-fit ${
-                          app.status === "approved"
-                            ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400"
-                            : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
-                        }`}
-                      >
-                        {app.status === "approved" ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
-                        {app.status === "approved" ? "Вы пригласили" : "Вы отказали"}
-                      </div>
-                      <div className="flex-grow">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Ваш ответ:</p>
-                        <div className="bg-card border rounded-lg p-3 text-sm text-muted-foreground italic relative">
-                          <div className="absolute -top-1.5 left-4 w-3 h-3 bg-card border-t border-l transform rotate-45" />
-                          &ldquo;{app.responseMessage}&rdquo;
+              <div key={app.id} className="print:break-inside-avoid">
+                <ApplicationCard
+                  data={app}
+                  actionSlot={
+                    app.status === "pending" ? (
+                      <>
+                        <div className="print:hidden">
+                          <ApplicationResponseForm applicationId={app.id} />
+                        </div>
+                        <div className="hidden print:flex print:flex-row print:items-center print:gap-2 print:border-t print:border-gray-200 print:pt-2">
+                          <div className="font-bold text-sm px-3 py-2 rounded-md w-fit print:mb-0 print:p-0 print:bg-transparent print:text-black">
+                            Решение: Ожидает рассмотрения
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="h-full flex flex-col print:flex-row print:items-center print:gap-2 print:border-t print:border-gray-200 print:pt-2">
+                        <div
+                          className={`mb-4 flex items-center gap-2 font-bold text-sm px-3 py-2 rounded-md w-fit print:mb-0 print:p-0 print:bg-transparent ${
+                            app.status === "approved"
+                              ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400 print:text-black"
+                              : "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400 print:text-black"
+                          }`}
+                        >
+                          <span className="print:hidden">{app.status === "approved" ? <CheckCircle2 size={16} /> : <XCircle size={16} />}</span>
+                          {app.status === "approved" ? "Решение: Приглашен" : "Решение: Отказ"}
+                        </div>
+                        <div className="flex-grow print:flex print:items-center print:gap-2 print:flex-wrap">
+                          <p className="text-xs font-semibold text-muted-foreground uppercase mb-2 print:mb-0 print:text-black print:normal-case">| Ваш ответ:</p>
+                          <div className="bg-card border rounded-lg p-3 text-sm text-muted-foreground italic relative print:border-none print:p-0 print:text-black">
+                            <div className="absolute -top-1.5 left-4 w-3 h-3 bg-card border-t border-l transform rotate-45 print:hidden" />
+                            &ldquo;{app.responseMessage}&rdquo;
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )
-                }
-              />
+                    )
+                  }
+                />
+              </div>
             ))}
           </div>
 
-          <Pagination 
-            currentPage={currentPage}
-            totalPages={totalPages}
-          />
+          <div className="print:hidden">
+            <Pagination 
+              currentPage={currentPage}
+              totalPages={totalPages}
+            />
+          </div>
         </>
       )}
     </div>
